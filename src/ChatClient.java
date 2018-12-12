@@ -30,17 +30,22 @@ public class ChatClient {
     private BufferedReader input; //reader for network stream
     private PrintWriter output;  //printwriter for network output
     private boolean running = true; //thread status via boolean
+    private JFrame window;
 
     public static void main(String[] args) {
         new ChatClient().go();
     }
 
+    /**
+     * Runs when client starts
+     */
     public void go() {
-        JFrame window = new JFrame("Chat Client");
+        // make client window
+        window = new JFrame("Chat Client");
         southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(2, 0));
-
-
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // create buttons
         sendButton = new JButton("SEND");
         sendButton.addActionListener(new SendButtonListener());
         clearButton = new JButton("QUIT");
@@ -48,18 +53,22 @@ public class ChatClient {
 
         JLabel errorLabel = new JLabel("");
 
+        // make message areas
         typeField = new JTextField(10);
         msgArea = new JTextArea();
         msgArea.setEditable(false);
 
+        // add to panel
         southPanel.add(typeField);
         southPanel.add(sendButton);
         southPanel.add(errorLabel);
         southPanel.add(clearButton);
 
+        // set window layouts
         window.add(BorderLayout.CENTER, msgArea);
         window.add(BorderLayout.SOUTH, southPanel);
 
+        // set window size
         window.setSize(400, 400);
         window.setVisible(true);
 
@@ -68,7 +77,6 @@ public class ChatClient {
         // after connecting loop and keep appending[.append()] to the JTextArea
 
         readMessagesFromServer();
-
     }
 
     //Attempts to connect to the server and creates the socket and streams
@@ -76,7 +84,7 @@ public class ChatClient {
         System.out.println("Attempting to make a connection..");
 
         try {
-            mySocket = new Socket("127.0.0.1", 5000); //attempt socket connection (local address). This will wait until a connection is made
+            mySocket = new Socket(ip, port); //attempt socket connection (local address). This will wait until a connection is made
 
             InputStreamReader stream1 = new InputStreamReader(mySocket.getInputStream()); //Stream for network input
             input = new BufferedReader(stream1);
@@ -116,7 +124,7 @@ public class ChatClient {
         } catch (Exception e) {
             System.out.println("Failed to close socket");
         }
-
+        window.dispose();
     }
     //****** Inner Classes for Action Listeners ****
 

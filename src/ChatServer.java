@@ -66,13 +66,42 @@ public class ChatServer {
     }
 
     public void handle(String msg, String name) {
-        for (int i = 0; i < clients.size(); i++) {
-            //make sure they have username
-            if (clients.get(i).getName() != null) {
-                if (clients.get(i).getName().equals(name)) {
-                    clients.get(i).send(msg);
-                } else {
-                    clients.get(i).send(name, msg);
+
+        // private messages in form "/msg name message"
+        System.out.println(msg);
+        if (msg.startsWith("/pm ")) {
+            System.out.println("got the private message");
+            String[] words = msg.split(" ");
+            String receiver = words[1];
+            System.out.println(receiver);
+            boolean sent = false;
+            for (int i = 0; i < clients.size(); i++) {
+                if (clients.get(i).getName().equals(receiver)) {
+                    clients.get(i).send(name + " (private)", msg.substring(4 + receiver.length() + 1));
+                    sent = true;
+                } else if (clients.get(i).getName().equals(name)) {
+                    clients.get(i).sentPM(receiver, msg.substring(4 + receiver.length() + 1));
+                    System.out.println("self pm");
+                }
+            }
+            if (!sent) {
+                for (int i = 0; i < clients.size(); i++) {
+                    if (clients.get(i).getName().equals(name)) {
+                        clients.get(i).sendError("Username not found.");
+                    }
+                }
+            }
+        } else {
+
+            // standard messages
+            for (int i = 0; i < clients.size(); i++) {
+                //make sure they have username
+                if (clients.get(i).getName() != null) {
+                    if (clients.get(i).getName().equals(name)) {
+                        clients.get(i).send(msg);
+                    } else {
+                        clients.get(i).send(name, msg);
+                    }
                 }
             }
         }
@@ -157,13 +186,26 @@ public class ChatServer {
         } // end of run()
 
         public void send(String msg) {
+            // maybe something to indicate that this user sent the message
             output.println(this.name + ": " + msg);
             output.flush();
         }
 
         public void send(String name, String msg) {
+            // other people sent the message
             output.println(name + ": " + msg);
             output.flush();
         }
+
+        public void sendError(String error) {
+            output.println(error);
+            output.flush();
+        }
+
+        public void sentPM(String receiver, String msg) {
+            output.println(getName() + " to " + receiver + " (private) : " + msg);
+            output.flush();
+        }
+
     } //end of inner class
 } //end of Class
