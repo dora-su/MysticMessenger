@@ -49,8 +49,8 @@ public class ChatClient {
         JLabel errorLabel = new JLabel("");
 
         typeField = new JTextField(10);
-
         msgArea = new JTextArea();
+        msgArea.setEditable(false);
 
         southPanel.add(typeField);
         southPanel.add(sendButton);
