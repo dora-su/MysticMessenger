@@ -20,7 +20,6 @@ public class ChatServer {
     static Boolean running = true;  // controls if the server is accepting clients
     private ArrayList<ConnectionHandler> clients = new ArrayList<ConnectionHandler>();
 
-
     /**
      * Main
      *
@@ -43,7 +42,6 @@ public class ChatServer {
             serverSock = new ServerSocket(5000);  //assigns an port to the server
             //serverSock.setSoTimeout(15000);  //15 second timeout
             while (running) {  //this loops to accept multiple clients
-                System.out.println("chceking");
                 client = serverSock.accept();  //wait for connection
                 ConnectionHandler c = new ConnectionHandler(client, this);
                 clients.add(c);
@@ -65,6 +63,12 @@ public class ChatServer {
         }
     }
 
+    /**
+     * Processes a message to determine if it is a command or a normal message, and sends it to clients accordingly
+     *
+     * @param msg  the message
+     * @param name the name of the client who sent the message
+     */
     public void handle(String msg, String name) {
 
         // private messages in form "/msg name message"
@@ -105,6 +109,17 @@ public class ChatServer {
                 }
             }
         }
+    }
+
+    public boolean usableName(String name) {
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).getName() != null) {
+                if (clients.get(i).getName().equals(name)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     //***** Inner class - thread for client connection
@@ -150,8 +165,14 @@ public class ChatServer {
             while (!nameSet) {
                 try {
                     if (input.ready()) {
-                        this.name = input.readLine();
-                        nameSet = true;
+                        String name = input.readLine();
+                        if (usableName(name) && !name.equals("")) {
+                            this.name = name;
+                            nameSet = true;
+                        } else {
+                            output.println("Username has been taken.");
+                            output.flush();
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
