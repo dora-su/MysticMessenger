@@ -4,12 +4,7 @@
  * @ version 1.0a
  */
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -41,7 +36,12 @@ public class ChatClient {
      */
     public void go() {
         // make client window
-        window = new JFrame("Chat Client");
+        window = new JFrame("Mystic Messenger");
+        //set icon image
+        ImageIcon icon = new ImageIcon("dependencies/Icon.png");
+        window.setIconImage(icon.getImage());
+
+
         southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(2, 0));
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
