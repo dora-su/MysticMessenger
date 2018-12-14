@@ -73,41 +73,45 @@ public class ChatServer {
 
         // private messages in form "/msg name message"
         System.out.println(msg);
-        if (msg.startsWith("/pm ")) {
-            System.out.println("got the private message");
-            String[] words = msg.split(" ");
-            String receiver = words[1];
-            System.out.println(receiver);
-            boolean sent = false;
-            for (int i = 0; i < clients.size(); i++) {
-                if (clients.get(i).getName().equals(receiver)) {
-                    clients.get(i).send(name + " (private)", msg.substring(4 + receiver.length() + 1));
-                    sent = true;
-                } else if (clients.get(i).getName().equals(name)) {
-                    clients.get(i).sentPM(receiver, msg.substring(4 + receiver.length() + 1));
-                    System.out.println("self pm");
-                }
-            }
-            if (!sent) {
+        if (msg.startsWith("msg ")) { // user sent text
+            msg = msg.substring(4);
+            if (msg.startsWith("/pm ")) {
+                System.out.println("got the private message");
+                String[] words = msg.split(" ");
+                String receiver = words[1];
+                System.out.println(receiver);
+                boolean sent = false;
                 for (int i = 0; i < clients.size(); i++) {
-                    if (clients.get(i).getName().equals(name)) {
-                        clients.get(i).sendError("Username not found.");
+                    if (clients.get(i).getName().equals(receiver)) {
+                        clients.get(i).send(name + " (private)", msg.substring(4 + receiver.length() + 1));
+                        sent = true;
+                    } else if (clients.get(i).getName().equals(name)) {
+                        clients.get(i).sentPM(receiver, msg.substring(4 + receiver.length() + 1));
+                        System.out.println("self pm");
+                    }
+                }
+                if (!sent) {
+                    for (int i = 0; i < clients.size(); i++) {
+                        if (clients.get(i).getName().equals(name)) {
+                            clients.get(i).sendError("Username not found.");
+                        }
+                    }
+                }
+            } else {
+                // standard messages
+                for (int i = 0; i < clients.size(); i++) {
+                    //make sure they have username
+                    if (clients.get(i).getName() != null) {
+                        if (clients.get(i).getName().equals(name)) {
+                            clients.get(i).send(msg);
+                        } else {
+                            clients.get(i).send(name, msg);
+                        }
                     }
                 }
             }
-        } else {
-
-            // standard messages
-            for (int i = 0; i < clients.size(); i++) {
-                //make sure they have username
-                if (clients.get(i).getName() != null) {
-                    if (clients.get(i).getName().equals(name)) {
-                        clients.get(i).send(msg);
-                    } else {
-                        clients.get(i).send(name, msg);
-                    }
-                }
-            }
+        } else if (msg.startsWith("clients ")) { // list of online clients
+            
         }
     }
 
@@ -169,6 +173,8 @@ public class ChatServer {
                         if (usableName(name) && !name.equals("")) {
                             this.name = name;
                             nameSet = true;
+                            output.println("valid");
+                            output.flush();
                         } else {
                             output.println("Username has been taken.");
                             output.flush();
@@ -205,15 +211,18 @@ public class ChatServer {
                 System.out.println("Failed to close socket");
             }
         } // end of run()
-        public Message getMessage(String name, String msg){
-            return new Message(name,msg);
+
+        public Message getMessage(String name, String msg) {
+            return new Message(name, msg);
         }
-        public Message getMessage(String msg){
+
+        public Message getMessage(String msg) {
             return new Message(msg);
         }
+
         public void send(String msg) {
             // maybe something to indicate that this user sent the message
-           // output.println(this.name + ": " + msg);
+            // output.println(this.name + ": " + msg);
             output.println(this.name);
             output.println(msg);
             output.flush();
