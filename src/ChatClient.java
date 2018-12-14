@@ -21,19 +21,16 @@ public class ChatClient {
     private JTextField typeField;
    // private JTextArea msgArea;
     private JScrollPane scrollPane;
-    private JList<Message> msgArea = new JList<>();
+    private JList<JLabel> msgArea = new JList<>();
     private JPanel southPanel;
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
     private PrintWriter output;  //printwriter for network output
     private boolean running = true; //thread status via boolean
     private JFrame window;
-
+private DefaultListModel msgs = new DefaultListModel();
     public static void main(String[] args) {
-//        UIManager.put("InternalFrame.activeTitleBackground", new ColorUIResource(Color.black ));
-//        UIManager.put("InternalFrame.activeTitleForeground", new ColorUIResource(Color.WHITE));
-//        UIManager.put("InternalFrame.titleFont", new Font("Dialog", Font.PLAIN, 11));
-//        JFrame.setDefaultLookAndFeelDecorated(true);
+
         new ChatClient().go();
     }
 
@@ -43,12 +40,14 @@ public class ChatClient {
     public void go() {
         // make client window
         window = new JFrame("Mystic Messenger");
+        window.setBackground(new Color(70,70,70));
         //set icon image
         ImageIcon icon = new ImageIcon("dependencies/Icon.png");
         window.setIconImage(icon.getImage());
         window.setMinimumSize(new Dimension(425,700));
 
         southPanel = new JPanel();
+        southPanel.setBackground(new Color(70,70,70));
         southPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
@@ -61,8 +60,7 @@ public class ChatClient {
         msgArea.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         msgArea.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         msgArea.setVisibleRowCount(-1);
-        msgArea.add(new Message("ugly", "ugllyy"));
-
+        msgArea = new JList<>(msgs);
         scrollPane = new JScrollPane(msgArea);
 //        scrollPane.setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -163,7 +161,8 @@ public class ChatClient {
                     String msg, name;
                     name = input.readLine();
                     msg = input.readLine();
-                    msgArea.add(new Message(name, msg));
+                    msgs.addElement(new JLabel(msg));
+                    msgs.addElement(new JLabel(name));
                      //read the message
                    // msgArea.append(msg + "\n");
                 }
