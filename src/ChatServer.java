@@ -205,16 +205,25 @@ public class ChatServer {
                 System.out.println("Failed to close socket");
             }
         } // end of run()
-
+        public Message getMessage(String name, String msg){
+            return new Message(name,msg);
+        }
+        public Message getMessage(String msg){
+            return new Message(msg);
+        }
         public void send(String msg) {
             // maybe something to indicate that this user sent the message
-            output.println(this.name + ": " + msg);
+           // output.println(this.name + ": " + msg);
+            output.println(this.name);
+            output.println(msg);
             output.flush();
         }
 
         public void send(String name, String msg) {
             // other people sent the message
-            output.println(name + ": " + msg);
+//            output.println(name + ": " + msg);
+            output.println(name);
+            output.println(msg);
             output.flush();
         }
 

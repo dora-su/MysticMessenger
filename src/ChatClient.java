@@ -21,7 +21,7 @@ public class ChatClient {
     private JTextField typeField;
    // private JTextArea msgArea;
     private JScrollPane scrollPane;
-    private JList<String> msgArea;
+    private JList<Message> msgArea = new JList<>();
     private JPanel southPanel;
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
@@ -57,9 +57,14 @@ public class ChatClient {
         ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
 
 
-        msgArea = new JList<>();
+       // msgArea = new JList<>();
+        msgArea.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        msgArea.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        msgArea.setVisibleRowCount(-1);
+        msgArea.add(new Message("ugly", "ugllyy"));
+
         scrollPane = new JScrollPane(msgArea);
-        scrollPane.setOpaque(false);
+//        scrollPane.setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
        // scrollPane.setPreferredSize(new Dimension(370,500));
@@ -111,6 +116,8 @@ public class ChatClient {
        // southPanel.add(errorLabel);
         //southPanel.add(clearButton);
 
+//        Message message = new Message("ugly","gul");
+//        southPanel.add(message);
         // set window layouts
         window.add(southPanel);
         window.pack();
@@ -153,8 +160,11 @@ public class ChatClient {
 
                 if (input.ready()) { //check for an incoming messge
 
-                    String msg;
-                    msg = input.readLine(); //read the message
+                    String msg, name;
+                    name = input.readLine();
+                    msg = input.readLine();
+                    msgArea.add(new Message(name, msg));
+                     //read the message
                    // msgArea.append(msg + "\n");
                 }
 
