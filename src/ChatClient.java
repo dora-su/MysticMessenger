@@ -40,6 +40,7 @@ public class ChatClient {
     private JTextField usernameT;
     private JTextField ipT;
     private JTextField portT;
+    private JLabel errorMessage;
     ImageIcon icon = new ImageIcon("dependencies/Icon.png");
     private int tempWidth;
 
@@ -59,7 +60,7 @@ public class ChatClient {
         logon.setResizable(false);
 //        logon.setBackground(new Color(70,70,70));
         logon.setIconImage(icon.getImage());
-        logon.setSize(400, 350);
+        logon.setSize(400, 375);
         logonScreen = new JPanel();
 
 
@@ -103,6 +104,11 @@ public class ChatClient {
         portT.setBounds(110, 170, 260, 30);
         logonScreen.add(portT);
 
+        errorMessage = new JLabel();
+        errorMessage.setBounds(30, 260, 340, 40);
+        errorMessage.setForeground(Color.red);
+        logonScreen.add(errorMessage);
+
         login = new JButton("Let's Go!");
         tempWidth = (int) login.getPreferredSize().getWidth();
         login.setBounds(30, 220, 340, 40);
@@ -111,10 +117,15 @@ public class ChatClient {
             public void actionPerformed(ActionEvent e) {
                 //somehow check name
                 while (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
+                    errorMessage.setText("Username cannot be blank. Please enter a username.");
                     // ask user for new username and receive it
-
+//                   if(usernameT.getText().length()==0) {
+//                       errorMessage.setText("Username cannot be blank. Please enter a username.");
+//                   }else{
+//                       errorMessage.setText("Username is already taken. Please enter a new username.");
+//                   }
                 }
-                chatWindow();
+               // chatWindow();
             }
         });
         logonScreen.add(login);
@@ -231,7 +242,7 @@ public class ChatClient {
 //        clearButton = new JButton("QUIT");
 //        clearButton.addActionListener(new QuitButtonListener());
 
-        JLabel errorLabel = new JLabel("");
+
 
 
         // add to panel
