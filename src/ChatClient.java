@@ -5,8 +5,8 @@
  */
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import javax.swing.plaf.ColorUIResource;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -19,7 +19,9 @@ public class ChatClient {
 
     private JButton sendButton, clearButton;
     private JTextField typeField;
-    private JTextArea msgArea;
+   // private JTextArea msgArea;
+    private JScrollPane scrollPane;
+    private JList<String> msgArea;
     private JPanel southPanel;
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
@@ -28,6 +30,10 @@ public class ChatClient {
     private JFrame window;
 
     public static void main(String[] args) {
+//        UIManager.put("InternalFrame.activeTitleBackground", new ColorUIResource(Color.black ));
+//        UIManager.put("InternalFrame.activeTitleForeground", new ColorUIResource(Color.WHITE));
+//        UIManager.put("InternalFrame.titleFont", new Font("Dialog", Font.PLAIN, 11));
+//        JFrame.setDefaultLookAndFeelDecorated(true);
         new ChatClient().go();
     }
 
@@ -40,36 +46,76 @@ public class ChatClient {
         //set icon image
         ImageIcon icon = new ImageIcon("dependencies/Icon.png");
         window.setIconImage(icon.getImage());
-
+        window.setMinimumSize(new Dimension(425,700));
 
         southPanel = new JPanel();
-        southPanel.setLayout(new GridLayout(2, 0));
+        southPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // create buttons
-        sendButton = new JButton("SEND");
+        ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
+
+
+        msgArea = new JList<>();
+        scrollPane = new JScrollPane(msgArea);
+        scrollPane.setOpaque(false);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+       // scrollPane.setPreferredSize(new Dimension(370,500));
+        scrollPane.setMinimumSize(new Dimension(425,600));
+//        c.ipady = 500;
+//        c.ipadx = 370;
+        c.fill = GridBagConstraints.BOTH;
+        //c.anchor = GridBagConstraints.LINE_START;
+        c.insets = new Insets(0,10,2,10);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.gridwidth=2;
+        c.gridy=3;
+        southPanel.add(scrollPane,c);
+
+        // make message areas
+        typeField = new JTextField(60);
+        typeField.setMinimumSize(new Dimension(300,30));
+        c.insets = new Insets(5,10,5,0);
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.anchor = (GridBagConstraints.WEST);
+        c.gridx = 1;
+        c.gridy = 4;
+        c.gridwidth  = 1;
+        southPanel.add(typeField,c);
+
+        sendButton = new JButton(sendIcon);
         sendButton.addActionListener(new SendButtonListener());
-        clearButton = new JButton("QUIT");
-        clearButton.addActionListener(new QuitButtonListener());
+        sendButton.setBorderPainted(false);
+        sendButton.setContentAreaFilled(false);
+        sendButton.setMaximumSize(new Dimension(60,60));
+      c.anchor = (GridBagConstraints.LAST_LINE_END);
+        c.gridx = 2;
+        c.gridy=4;
+        southPanel.add(sendButton,c);
+
+//
+//        clearButton = new JButton("QUIT");
+//        clearButton.addActionListener(new QuitButtonListener());
 
         JLabel errorLabel = new JLabel("");
 
-        // make message areas
-        typeField = new JTextField(10);
-        msgArea = new JTextArea();
-        msgArea.setEditable(false);
+
+
 
         // add to panel
-        southPanel.add(typeField);
-        southPanel.add(sendButton);
-        southPanel.add(errorLabel);
-        southPanel.add(clearButton);
+
+       // southPanel.add(errorLabel);
+        //southPanel.add(clearButton);
 
         // set window layouts
-        window.add(BorderLayout.CENTER, msgArea);
-        window.add(BorderLayout.SOUTH, southPanel);
-
+        window.add(southPanel);
+        window.pack();
         // set window size
-        window.setSize(400, 400);
+        window.setSize(350, 700);
         window.setVisible(true);
 
         // call a method that connects to the server
@@ -109,7 +155,7 @@ public class ChatClient {
 
                     String msg;
                     msg = input.readLine(); //read the message
-                    msgArea.append(msg + "\n");
+                   // msgArea.append(msg + "\n");
                 }
 
             } catch (IOException e) {
