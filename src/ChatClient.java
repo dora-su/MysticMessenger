@@ -54,7 +54,6 @@ private DefaultListModel msgs = new DefaultListModel();
      */
     public void go() {
         // make client window
-        GridBagConstraints c = new GridBagConstraints();
         logon = new JFrame("Mystic Messenger");
         logon.setResizable(false);
 //        logon.setBackground(new Color(70,70,70));
@@ -109,7 +108,9 @@ private DefaultListModel msgs = new DefaultListModel();
         login.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                //somehow check name
+                chatWindow();
+                connect(usernameT.getText(),ipT.getText(), Integer.parseInt(portT.getText()));
             }
         });
         logonScreen.add(login);
@@ -120,102 +121,11 @@ private DefaultListModel msgs = new DefaultListModel();
         logon.setFocusable(true);
         logon.setVisible(true);
 
-//
-//
-//        window = new JFrame("Mystic Messenger");
-//        window.setBackground(new Color(70,70,70));
-//        //set icon image
-//
-//        window.setIconImage(icon.getImage());
-//        window.setMinimumSize(new Dimension(425,700));
-//
-//        southPanel = new JPanel();
-//        southPanel.setBackground(new Color(70,70,70));
-//        southPanel.setLayout(new GridBagLayout());
-//
-//
-//        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        // create buttons
-//        ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
-//
-//
-//       // msgArea = new JList<>();
-//        msgArea.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-//        msgArea.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-//        msgArea.setVisibleRowCount(-1);
-//        msgArea = new JList<>(msgs);
-//        scrollPane = new JScrollPane(msgArea);
-////        scrollPane.setOpaque(false);
-//        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-//        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-//       // scrollPane.setPreferredSize(new Dimension(370,500));
-//        scrollPane.setMinimumSize(new Dimension(425,600));
-////        c.ipady = 500;
-////        c.ipadx = 370;
-//        c.fill = GridBagConstraints.BOTH;
-//        //c.anchor = GridBagConstraints.LINE_START;
-//        c.insets = new Insets(0,10,2,0);
-//        c.gridx = 1;
-//        c.weightx = 1.0;
-//        c.gridwidth=2;
-//        c.gridy=3;
-//        southPanel.add(scrollPane,c);
-//
-//        // make message areas
-//        typeField = new JTextField(90);
-//        typeField.setOpaque(false);
-//        typeField.setMinimumSize(new Dimension(350,30));
-//        c.insets = new Insets(5,10,5,0);
-//        c.weightx = 1.0;
-//        c.weighty = 1.0;
-//        c.anchor = (GridBagConstraints.WEST);
-//        c.gridx = 1;
-//        c.gridy = 4;
-//        c.gridwidth  = 1;
-//        southPanel.add(typeField,c);
-//
-//        sendButton = new JButton(sendIcon);
-//        sendButton.addActionListener(new SendButtonListener());
-//        sendButton.setBorderPainted(false);
-//        sendButton.setContentAreaFilled(false);
-//        sendButton.setMaximumSize(new Dimension(60,60));
-//      c.anchor = (GridBagConstraints.LAST_LINE_END);
-//        c.gridx = 2;
-//        c.gridy=4;
-//        southPanel.add(sendButton,c);
-//
-////
-////        clearButton = new JButton("QUIT");
-////        clearButton.addActionListener(new QuitButtonListener());
-//
-//        JLabel errorLabel = new JLabel("");
-//
-//
-//
-//
-//        // add to panel
-//
-//       // southPanel.add(errorLabel);
-//        //southPanel.add(clearButton);
-//
-////        Message message = new Message("ugly","gul");
-////        southPanel.add(message);
-//        // set window layouts
-//        window.add(southPanel);
-//
-//        // set window size
-//        window.setSize(350, 700);
-//        window.setVisible(true);
-//
-//        // call a method that connects to the server
-//        conecnt("127.0.0.1", 5000);
-//        // after connecting loop and keep appending[.append()] to the JTextArea
-//
-//        readMessagesFromServer();
+
     }
 
     //Attempts to connect to the server and creates the socket and streams
-    public Socket connect(String ip, int port) {
+    public Socket connect(String username, String ip, int port) {
         System.out.println("Attempting to make a connection..");
 
         try {
@@ -234,12 +144,107 @@ private DefaultListModel msgs = new DefaultListModel();
         return mySocket;
     }
 
+    private void chatWindow(){
+
+
+        GridBagConstraints c = new GridBagConstraints();
+        window = new JFrame("Mystic Messenger");
+        window.setBackground(new Color(70,70,70));
+        //set icon image
+
+        window.setIconImage(icon.getImage());
+        window.setMinimumSize(new Dimension(425,700));
+
+        southPanel = new JPanel();
+        southPanel.setBackground(new Color(70,70,70));
+        southPanel.setLayout(new GridBagLayout());
+
+
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // create buttons
+        ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
+
+
+       // msgArea = new JList<>();
+        msgArea.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        msgArea.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        msgArea.setVisibleRowCount(-1);
+        msgArea = new JList<>(msgs);
+        scrollPane = new JScrollPane(msgArea);
+//        scrollPane.setOpaque(false);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+       // scrollPane.setPreferredSize(new Dimension(370,500));
+        scrollPane.setMinimumSize(new Dimension(425,600));
+//        c.ipady = 500;
+//        c.ipadx = 370;
+        c.fill = GridBagConstraints.BOTH;
+        //c.anchor = GridBagConstraints.LINE_START;
+        c.insets = new Insets(0,10,2,0);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.gridwidth=2;
+        c.gridy=3;
+        southPanel.add(scrollPane,c);
+
+        // make message areas
+        typeField = new JTextField(90);
+        typeField.setOpaque(false);
+        typeField.setMinimumSize(new Dimension(350,30));
+        c.insets = new Insets(5,10,5,0);
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.anchor = (GridBagConstraints.WEST);
+        c.gridx = 1;
+        c.gridy = 4;
+        c.gridwidth  = 1;
+        southPanel.add(typeField,c);
+
+        sendButton = new JButton(sendIcon);
+        sendButton.addActionListener(new SendButtonListener());
+        sendButton.setBorderPainted(false);
+        sendButton.setContentAreaFilled(false);
+        sendButton.setMaximumSize(new Dimension(60,60));
+      c.anchor = (GridBagConstraints.LAST_LINE_END);
+        c.gridx = 2;
+        c.gridy=4;
+        southPanel.add(sendButton,c);
+
+//
+//        clearButton = new JButton("QUIT");
+//        clearButton.addActionListener(new QuitButtonListener());
+
+        JLabel errorLabel = new JLabel("");
+
+
+
+
+        // add to panel
+
+       // southPanel.add(errorLabel);
+        //southPanel.add(clearButton);
+
+//        Message message = new Message("ugly","gul");
+//        southPanel.add(message);
+        // set window layouts
+        window.add(southPanel);
+
+        // set window size
+        window.setSize(350, 700);
+        window.setVisible(true);
+
+        // call a method that connects to the server
+
+        // after connecting loop and keep appending[.append()] to the JTextArea
+
+
+        readMessagesFromServer();
+    }
     //Starts a loop waiting for server input and then displays it on the textArea
     public void readMessagesFromServer() {
 
         while (running) {  // loop unit a message is received
             try {
-
                 if (input.ready()) { //check for an incoming messge
 
                     String msg, name;
