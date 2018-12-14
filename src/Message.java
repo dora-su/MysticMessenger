@@ -8,8 +8,11 @@ public class Message extends JPanel {
   private LocalDateTime now ;
   private JLabel msg;
   private JLabel nameDate;
+  private String message, name;
 
        public Message (String name, String message){
+           this.name = name;
+           this.message = message;
            this.setLayout(new BorderLayout());
            now = LocalDateTime.now();
 
@@ -54,6 +57,11 @@ this.setVisible(true);
         this.setVisible(true);
 
     }
+
+
+    public String toString(){
+           return message + "\n" + name +" @ " + dtf.format(now);
+       }
 
 
 }
