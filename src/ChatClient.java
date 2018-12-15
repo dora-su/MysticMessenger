@@ -22,7 +22,7 @@ public class ChatClient {
     private JTextField typeField;
     // private JTextArea msgArea;
     private JScrollPane scrollPane;
-    private JList<JLabel> msgArea = new JList<>();
+    private JPanel msgArea;
     private JList online;
     private ArrayList<String> onlineList;
     private JPanel southPanel;
@@ -189,7 +189,7 @@ public class ChatClient {
         //set icon image
 
         window.setIconImage(icon.getImage());
-        window.setMinimumSize(new Dimension(625, 700));
+        window.setMinimumSize(new Dimension(625, 400));
 
         southPanel = new JPanel();
         southPanel.setBackground(new Color(70, 70, 70));
@@ -201,17 +201,13 @@ public class ChatClient {
         ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
 
 
-        // msgArea = new JList<>();
-        msgArea.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        msgArea.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        msgArea.setVisibleRowCount(-1);
-        msgArea = new JList<>(msgs);
+        msgArea = new JPanel(GridLayout());
         scrollPane = new JScrollPane(msgArea);
 //        scrollPane.setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         // scrollPane.setPreferredSize(new Dimension(370,500));
-        scrollPane.setMinimumSize(new Dimension(425, 600));
+        scrollPane.setMinimumSize(new Dimension(425, 300));
 //        c.ipady = 500;
 //        c.ipadx = 370;
         c.fill = GridBagConstraints.BOTH;
@@ -250,7 +246,7 @@ public class ChatClient {
         onlineList.add("gyerfw");
         online = new JList(onlineList.toArray());
         //online.setSelectionMode();
-        online.setMinimumSize(new Dimension(200,700));
+        online.setMinimumSize(new Dimension(200,400));
         c.insets = new Insets(5, 10, 10, 0);
         c.gridx = 1;
         c.gridwidth = 1;
@@ -276,7 +272,7 @@ public class ChatClient {
         window.add(southPanel);
 
         // set window size
-        window.setSize(350, 700);
+        window.setSize(350, 400);
         window.setVisible(true);
 
         // call a method that connects to the server
