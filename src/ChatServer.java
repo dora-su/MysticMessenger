@@ -169,7 +169,7 @@ public class ChatServer {
             while (!nameSet) {
                 try {
                     if (input.ready()) {
-                        String name = input.readLine();
+                        String name = input.readLine().substring(10);
                         if (usableName(name) && !name.equals("")) {
                             this.name = name;
                             nameSet = true;

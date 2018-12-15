@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ChatClient {
 
@@ -22,6 +23,8 @@ public class ChatClient {
     // private JTextArea msgArea;
     private JScrollPane scrollPane;
     private JList<JLabel> msgArea = new JList<>();
+    private JList online;
+    private ArrayList<String> onlineList;
     private JPanel southPanel;
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
@@ -60,7 +63,7 @@ public class ChatClient {
         logon.setResizable(false);
 //        logon.setBackground(new Color(70,70,70));
         logon.setIconImage(icon.getImage());
-        logon.setSize(400, 375);
+        logon.setSize(400, 380);
         logonScreen = new JPanel();
 
 
@@ -104,10 +107,10 @@ public class ChatClient {
         portT.setBounds(110, 170, 260, 30);
         logonScreen.add(portT);
 
-        errorMessage = new JLabel();
+        errorMessage = new JLabel("");
         errorMessage.setBounds(30, 260, 340, 40);
         errorMessage.setForeground(Color.red);
-        logonScreen.add(errorMessage);
+
 
         login = new JButton("Let's Go!");
         tempWidth = (int) login.getPreferredSize().getWidth();
@@ -116,18 +119,21 @@ public class ChatClient {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //somehow check name
-                while (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
-                    errorMessage.setText("Username cannot be blank. Please enter a username.");
-                    // ask user for new username and receive it
-//                   if(usernameT.getText().length()==0) {
-//                       errorMessage.setText("Username cannot be blank. Please enter a username.");
-//                   }else{
-//                       errorMessage.setText("Username is already taken. Please enter a new username.");
-//                   }
+                if((usernameT.getText().length() == 0) || (ipT.getText().length()==0) || (portT.getText().length()==0)){
+                    errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
                 }
-               // chatWindow();
+               // boolean ugly = connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()));
+                //System.out.println(ugly);
+               if (! connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
+                    errorMessage.setText("Username is already taken. Please enter a new username.");
+                   System.out.println("ugly");
+                }
+                logon.dispose();
+                chatWindow();
             }
         });
+        errorMessage.setVisible(true);
+        logonScreen.add(errorMessage);
         logonScreen.add(login);
 
         logon.add(logonScreen);
@@ -144,6 +150,9 @@ public class ChatClient {
         System.out.println("Attempting to make a connection..");
 
         try {
+            if(username.length()==0){
+                return false;
+            }
             mySocket = new Socket(ip, port); //attempt socket connection (local address). This will wait until a connection is made
 
             InputStreamReader stream1 = new InputStreamReader(mySocket.getInputStream()); //Stream for network input
@@ -156,6 +165,7 @@ public class ChatClient {
             try {
                 if (input.ready()) {
                     String msg = input.readLine();
+                   // System.out.println("ready");
                     if (!msg.equals("valid")) {
                         return false;
                     }
@@ -173,15 +183,13 @@ public class ChatClient {
     }
 
     private void chatWindow() {
-
-
         GridBagConstraints c = new GridBagConstraints();
         window = new JFrame("Mystic Messenger");
         window.setBackground(new Color(70, 70, 70));
         //set icon image
 
         window.setIconImage(icon.getImage());
-        window.setMinimumSize(new Dimension(425, 700));
+        window.setMinimumSize(new Dimension(625, 700));
 
         southPanel = new JPanel();
         southPanel.setBackground(new Color(70, 70, 70));
@@ -209,7 +217,7 @@ public class ChatClient {
         c.fill = GridBagConstraints.BOTH;
         //c.anchor = GridBagConstraints.LINE_START;
         c.insets = new Insets(0, 10, 2, 0);
-        c.gridx = 1;
+        c.gridx = 2;
         c.weightx = 1.0;
         c.gridwidth = 2;
         c.gridy = 3;
@@ -223,7 +231,7 @@ public class ChatClient {
         c.weightx = 1.0;
         c.weighty = 1.0;
         c.anchor = (GridBagConstraints.WEST);
-        c.gridx = 1;
+        c.gridx = 2;
         c.gridy = 4;
         c.gridwidth = 1;
         southPanel.add(typeField, c);
@@ -234,10 +242,22 @@ public class ChatClient {
         sendButton.setContentAreaFilled(false);
         sendButton.setMaximumSize(new Dimension(60, 60));
         c.anchor = (GridBagConstraints.LAST_LINE_END);
-        c.gridx = 2;
+        c.gridx = 3;
         c.gridy = 4;
         southPanel.add(sendButton, c);
 
+        onlineList = new ArrayList<>();
+        onlineList.add("gyerfw");
+        online = new JList(onlineList.toArray());
+        //online.setSelectionMode();
+        online.setMinimumSize(new Dimension(200,700));
+        c.insets = new Insets(5, 10, 10, 0);
+        c.gridx = 1;
+        c.gridwidth = 1;
+        c.gridy = 1;
+        c.gridheight = 4;
+        c.fill = GridBagConstraints.BOTH;
+        southPanel.add(online,c);
 //
 //        clearButton = new JButton("QUIT");
 //        clearButton.addActionListener(new QuitButtonListener());
@@ -264,7 +284,7 @@ public class ChatClient {
         // after connecting loop and keep appending[.append()] to the JTextArea
 
 
-        readMessagesFromServer();
+     //  readMessagesFromServer();
     }
 
     //Starts a loop waiting for server input and then displays it on the textArea
