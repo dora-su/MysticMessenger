@@ -72,14 +72,11 @@ public class ChatServer {
     public void handle(String msg, String name) {
 
         // private messages in form "/msg name message"
-        System.out.println(msg);
         if (msg.startsWith("msg ")) { // user sent text
-            msg = msg.substring(4);
-            if (msg.startsWith("/pm ")) {
-                System.out.println("got the private message");
+            if (msg.substring(4).startsWith("/pm ")) {
+                msg = msg.substring(4);
                 String[] words = msg.split(" ");
                 String receiver = words[1];
-                System.out.println(receiver);
                 boolean sent = false;
                 for (int i = 0; i < clients.size(); i++) {
                     if (clients.get(i).getName().equals(receiver)) {
@@ -87,7 +84,6 @@ public class ChatServer {
                         sent = true;
                     } else if (clients.get(i).getName().equals(name)) {
                         clients.get(i).sentPM(receiver, msg.substring(4 + receiver.length() + 1));
-                        System.out.println("self pm");
                     }
                 }
                 if (!sent) {
@@ -102,16 +98,14 @@ public class ChatServer {
                 for (int i = 0; i < clients.size(); i++) {
                     //make sure they have username
                     if (clients.get(i).getName() != null) {
-                        if (clients.get(i).getName().equals(name)) {
-                            clients.get(i).send(msg);
-                        } else {
-                            clients.get(i).send(name, msg);
-                        }
+                        clients.get(i).send(name, msg);
                     }
                 }
             }
-        } else if (msg.startsWith("clients ")) { // list of online clients
-            
+        } else if (msg.startsWith("client ")) { // list of online clients
+            for (ConnectionHandler i : clients) {
+                i.sendClient(msg);
+            }
         }
     }
 
@@ -170,7 +164,7 @@ public class ChatServer {
                 try {
                     if (input.ready()) {
                         String name = input.readLine().substring(10);
-                        if (usableName(name) && !name.equals("")) {
+                        if (usableName(name)) {
                             this.name = name;
                             nameSet = true;
                             output.println("valid");
@@ -187,6 +181,7 @@ public class ChatServer {
 
             //Get a message from the client
             while (running) {  // loop unit a message is received
+
                 try {
                     if (input.ready()) { //check for an incoming messge
                         msg = input.readLine();  //get a message from the client
@@ -212,24 +207,16 @@ public class ChatServer {
             }
         } // end of run()
 
-        public void send(String msg) {
-            // maybe something to indicate that this user sent the message
-            // output.println(this.name + ": " + msg);
-            output.println(this.name);
-            output.println(msg);
-            output.flush();
-        }
-
         public void send(String name, String msg) {
             // other people sent the message
-//            output.println(name + ": " + msg);
-            output.println(name);
-            output.println(msg);
+            output.println(name + ": " + msg);
+//            output.println(name);
+//            output.println(msg);
             output.flush();
         }
 
         public void sendError(String error) {
-            output.println(error);
+            output.println("error " + error);
             output.flush();
         }
 
@@ -238,5 +225,9 @@ public class ChatServer {
             output.flush();
         }
 
+        public void sendClient(String msg) {
+            output.println(msg);
+            output.flush();
+        }
     } //end of inner class
 } //end of Class

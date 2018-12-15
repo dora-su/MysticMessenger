@@ -119,17 +119,18 @@ public class ChatClient {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //somehow check name
-                if((usernameT.getText().length() == 0) || (ipT.getText().length()==0) || (portT.getText().length()==0)){
+                if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
                     errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
                 }
-               // boolean ugly = connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()));
+                // boolean ugly = connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()));
                 //System.out.println(ugly);
-               if (! connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
+                if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
                     errorMessage.setText("Username is already taken. Please enter a new username.");
-        usernameT.setText("");
-                   System.out.println("ugly");
+                    usernameT.setText("");
+                    System.out.println("ugly");
                 }
-        name= usernameT.getText();
+                name = usernameT.getText();
+                System.out.println(name);
                 logon.dispose();
                 chatWindow();
             }
@@ -151,7 +152,7 @@ public class ChatClient {
         System.out.println("Attempting to make a connection..");
 
         try {
-            if(username.length()==0){
+            if (username.length() == 0) {
                 return false;
             }
             mySocket = new Socket(ip, port); //attempt socket connection (local address). This will wait until a connection is made
@@ -161,14 +162,20 @@ public class ChatClient {
             output = new PrintWriter(mySocket.getOutputStream()); //assign printwriter to network stream
 
             // send username
+            System.out.println("username + " + username);
             output.println("username " + username);
             output.flush();
             try {
-                if (input.ready()) {
-                    String msg = input.readLine();
-                   // System.out.println("ready");
-                    if (!msg.equals("valid")) {
-                        return false;
+                boolean nameValid = false;
+                while (!nameValid) {
+                    if (input.ready()) {
+                        String msg = input.readLine();
+                        // System.out.println("ready");
+                        if (!msg.equals("valid")) {
+                            return false;
+                        } else {
+                            nameValid = true;
+                        }
                     }
                 }
             } catch (IOException e1) {
@@ -196,7 +203,6 @@ public class ChatClient {
         southPanel.setBackground(new Color(70, 70, 70));
         southPanel.setLayout(new GridBagLayout());
 
-
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // create buttons
         ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
@@ -216,7 +222,7 @@ public class ChatClient {
         c.insets = new Insets(0, 10, 2, 0);
         c.gridx = 2;
         c.weightx = 1.0;
-        c.weighty= 1.0;
+        c.weighty = 1.0;
         c.gridwidth = 2;
         c.gridy = 3;
         southPanel.add(scrollPane, c);
@@ -227,13 +233,13 @@ public class ChatClient {
         typeField.setMinimumSize(new Dimension(350, 20));
         c.insets = new Insets(5, 10, 5, 0);
         c.weightx = 1.0;
-        c.fill=GridBagConstraints.BOTH;
+        c.fill = GridBagConstraints.BOTH;
         c.weighty = 0.0;
         c.anchor = (GridBagConstraints.CENTER);
         c.gridx = 2;
         c.gridy = 4;
         c.gridwidth = 1;
-        c.gridheight=1;
+        c.gridheight = 1;
         southPanel.add(typeField, c);
 
         sendButton = new JButton(sendIcon);
@@ -251,21 +257,19 @@ public class ChatClient {
         onlineList = new ArrayList<>();
         online = new JList(onlineList.toArray());
         //online.setSelectionMode();
-        online.setMinimumSize(new Dimension(200,400));
+        online.setMinimumSize(new Dimension(200, 400));
         c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 1;
-        c.weighty=1.0;
-        c.weightx=1.0;
+        c.weighty = 1.0;
+        c.weightx = 1.0;
         c.gridwidth = 1;
         c.gridy = 1;
         c.gridheight = 4;
         c.fill = GridBagConstraints.BOTH;
-        southPanel.add(online,c);
+        southPanel.add(online, c);
 //
 //        clearButton = new JButton("QUIT");
 //        clearButton.addActionListener(new QuitButtonListener());
-
-
 
 
         // add to panel
@@ -286,8 +290,7 @@ public class ChatClient {
 
         // after connecting loop and keep appending[.append()] to the JTextArea
 
-
-       readMessagesFromServer();
+        readMessagesFromServer();
     }
 
     //Starts a loop waiting for server input and then displays it on the textArea
@@ -296,14 +299,27 @@ public class ChatClient {
         while (running) {  // loop unit a message is received
             try {
                 if (input.ready()) { //check for an incoming messge
+                    String msg = input.readLine();
 
+                    if (msg.startsWith("client ")) {
+                        if (msg.substring(7).startsWith("add ")) {
+                            String name = msg.substring(11);
+                            // add to side panel
+                        } else {
+                            String name = msg.substring(17);
+                            // remove this client from side panel
+                            //
+                        }
+                    } else if (msg.startsWith("error ")) {
+                        msgArea.add(new Message(msg.substring(6)));
+                    } else {
+                        msg = msg.substring(4);
+                        String[] tokens = msg.split(": ");
+                        String msgName = tokens[0];
+                        String message = tokens[1];
+                        msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
+                    }
 
-//
-//                    name = input.readLine();
-//                    msg = input.readLine();
-//                    msgArea.add(new Message(name,msg,(name == this.name)));
-//                    //read the message
-                    // msgArea.append(msg + "\n");
                 }
 
             } catch (IOException e) {
