@@ -212,14 +212,6 @@ public class ChatServer {
             }
         } // end of run()
 
-        public Message getMessage(String name, String msg) {
-            return new Message(name, msg);
-        }
-
-        public Message getMessage(String msg) {
-            return new Message(msg);
-        }
-
         public void send(String msg) {
             // maybe something to indicate that this user sent the message
             // output.println(this.name + ": " + msg);

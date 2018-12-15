@@ -31,7 +31,7 @@ public class ChatClient {
     private PrintWriter output;  //printwriter for network output
     private boolean running = true; //thread status via boolean
     private JFrame window;
-
+    private String name = "woah";
 
     private JFrame logon;
     private JPanel logonScreen;
@@ -58,7 +58,7 @@ public class ChatClient {
      * Runs when client starts
      */
     public void go() {
-        // make client window
+//         make client window
         logon = new JFrame("Mystic Messenger");
         logon.setResizable(false);
 //        logon.setBackground(new Color(70,70,70));
@@ -126,8 +126,10 @@ public class ChatClient {
                 //System.out.println(ugly);
                if (! connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
                     errorMessage.setText("Username is already taken. Please enter a new username.");
+        usernameT.setText("");
                    System.out.println("ugly");
                 }
+        name= usernameT.getText();
                 logon.dispose();
                 chatWindow();
             }
@@ -141,7 +143,6 @@ public class ChatClient {
         logon.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         logon.setFocusable(true);
         logon.setVisible(true);
-
 
     }
 
@@ -199,9 +200,9 @@ public class ChatClient {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // create buttons
         ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
+        msgArea = new JPanel();
+        msgArea.setLayout(new BoxLayout(msgArea, BoxLayout.PAGE_AXIS));
 
-
-        msgArea = new JPanel(GridLayout());
         scrollPane = new JScrollPane(msgArea);
 //        scrollPane.setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -215,6 +216,7 @@ public class ChatClient {
         c.insets = new Insets(0, 10, 2, 0);
         c.gridx = 2;
         c.weightx = 1.0;
+        c.weighty= 1.0;
         c.gridwidth = 2;
         c.gridy = 3;
         southPanel.add(scrollPane, c);
@@ -222,14 +224,16 @@ public class ChatClient {
         // make message areas
         typeField = new JTextField(90);
         typeField.setOpaque(false);
-        typeField.setMinimumSize(new Dimension(350, 30));
+        typeField.setMinimumSize(new Dimension(350, 20));
         c.insets = new Insets(5, 10, 5, 0);
         c.weightx = 1.0;
-        c.weighty = 1.0;
-        c.anchor = (GridBagConstraints.WEST);
+        c.fill=GridBagConstraints.BOTH;
+        c.weighty = 0.0;
+        c.anchor = (GridBagConstraints.CENTER);
         c.gridx = 2;
         c.gridy = 4;
         c.gridwidth = 1;
+        c.gridheight=1;
         southPanel.add(typeField, c);
 
         sendButton = new JButton(sendIcon);
@@ -238,17 +242,20 @@ public class ChatClient {
         sendButton.setContentAreaFilled(false);
         sendButton.setMaximumSize(new Dimension(60, 60));
         c.anchor = (GridBagConstraints.LAST_LINE_END);
+        c.weightx = 0.0;
         c.gridx = 3;
         c.gridy = 4;
         southPanel.add(sendButton, c);
 
+        //implement online list
         onlineList = new ArrayList<>();
-        onlineList.add("gyerfw");
         online = new JList(onlineList.toArray());
         //online.setSelectionMode();
         online.setMinimumSize(new Dimension(200,400));
-        c.insets = new Insets(5, 10, 10, 0);
+        c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 1;
+        c.weighty=1.0;
+        c.weightx=1.0;
         c.gridwidth = 1;
         c.gridy = 1;
         c.gridheight = 4;
@@ -280,7 +287,7 @@ public class ChatClient {
         // after connecting loop and keep appending[.append()] to the JTextArea
 
 
-     //  readMessagesFromServer();
+       readMessagesFromServer();
     }
 
     //Starts a loop waiting for server input and then displays it on the textArea
@@ -290,12 +297,12 @@ public class ChatClient {
             try {
                 if (input.ready()) { //check for an incoming messge
 
-                    String msg, name;
-                    name = input.readLine();
-                    msg = input.readLine();
-                    msgs.addElement(new JLabel(msg));
-                    msgs.addElement(new JLabel(name));
-                    //read the message
+
+//
+//                    name = input.readLine();
+//                    msg = input.readLine();
+//                    msgArea.add(new Message(name,msg,(name == this.name)));
+//                    //read the message
                     // msgArea.append(msg + "\n");
                 }
 
