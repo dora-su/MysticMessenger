@@ -32,7 +32,7 @@ public class Message extends JTextPane{
     public Message (String error) {
         this.setContentType("text/html");
 
-        error = error.substring(6);
+//        error = error.substring(6);
         now = LocalDateTime.now();
         this.setBorder(new EmptyBorder(10,5,10,5));
         this.setText("<html><font size=-1>" + error + "</font><br><p><font size=-1>" +  "<i>" + dtf.format(now) + "</i><br></p></html>");
