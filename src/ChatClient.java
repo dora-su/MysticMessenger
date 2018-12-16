@@ -98,6 +98,7 @@ public class ChatClient {
 
         // make message areas
         typeField = new JTextField(90);
+        typeField.setForeground(new Color(250,250,250));
         typeField.setOpaque(false);
         typeField.setMinimumSize(new Dimension(350, 20));
         c.insets = new Insets(5, 10, 5, 0);
@@ -143,7 +144,6 @@ public class ChatClient {
         logon.setIconImage(icon.getImage());
         logon.setSize(400, 380);
 
-
         logon.setLayout(null);
 
         welcome = new JLabel("Welcome!");
@@ -188,7 +188,6 @@ public class ChatClient {
         errorMessage.setBounds(30, 260, 340, 40);
         errorMessage.setForeground(Color.red);
 
-
         login = new JButton("Let's Go!");
         tempWidth = (int) login.getPreferredSize().getWidth();
         login.setBounds(30, 220, 340, 40);
@@ -204,11 +203,11 @@ public class ChatClient {
                 if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
                     errorMessage.setText("Username is already taken. Please enter a new username.");
                     usernameT.setText("");
-                    System.out.println("ugly");
                 }
                 name = usernameT.getText();
                 System.out.println(name);
                 logon.dispose();
+                readMessagesFromServer();
                 window.setEnabled(true);
             }
         });
@@ -275,32 +274,6 @@ public class ChatClient {
         return true;
     }
 
-    private void chatWindow() {
-
-//
-//        clearButton = new JButton("QUIT");
-//        clearButton.addActionListener(new QuitButtonListener());
-
-
-        // add to panel
-
-        // southPanel.add(errorLabel);
-        //southPanel.add(clearButton);
-
-//        Message message = new Message("ugly","gul");
-//        southPanel.add(message);
-        // set window layouts
-        window.add(southPanel);
-
-        // set window size
-
-        // call a method that connects to the server
-
-        // after connecting loop and keep appending[.append()] to the JTextArea
-
-        readMessagesFromServer();
-    }
-
     //Starts a loop waiting for server input and then displays it on the textArea
     public void readMessagesFromServer() {
 
@@ -319,7 +292,7 @@ public class ChatClient {
                             //
                         }
                     } else if (msg.startsWith("error ")) {
-                      //  msgArea.add(new Message(msg.substring(6)));
+                        msgArea.add(new Message(msg.substring(6)));
                     } else {
                         msg = msg.substring(4);
                         String[] tokens = msg.split(": ");
