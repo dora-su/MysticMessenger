@@ -1,12 +1,18 @@
 /* [ChatClient.java]
- * A not-so-pretty implementation of a basic chat client
- * @author Mangat
+ * Simple chat client
+ * @author Dora Su & Chris Xie
  * @ version 1.0a
  */
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -19,242 +25,259 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ChatClient {
-
-    private JButton sendButton, clearButton;
-    private JTextField typeField;
-    // private JTextArea msgArea;
-    private JScrollPane scrollPane;
-    private JPanel msgArea;
-    private JList online;
-    private ArrayList<String> onlineList;
-    private JPanel southPanel;
+    //Server Variables
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
     private PrintWriter output;  //printwriter for network output
-    private boolean running = true; //thread status via boolean
-    private JFrame window;
-    private String name = "woah";
+    private boolean running; //thread status via boolean
 
-    private JDialog logon;
-    private JLabel welcome;
+    private String name = ""; //username
+
+    //chat window components
+    //JButtons
+    private JButton sendButton;
+    //JTextFields
+    private JTextField typeField;
+    //JScrollPanes
+    private JScrollPane scrollPane;//for scrolling through messages
+    //JPanels
+    private JPanel panel; //main panel
+    private JPanel msgArea;//panel messages are displayed on
+    //JLists and ArrayLists
+    private JList online;
+    private ArrayList<String> onlineList;
+    //JFrames
+    private JFrame window; //frame for displaying everything
+
+    //logon window components
+    private JDialog logon; //to display everything
+    //JButtons
     private JButton login;
+    //JLabels
+    private JLabel welcome;
     private JLabel username;
     private JLabel ip;
     private JLabel port;
+    private JLabel errorMessage; //dynamic to display errors upon clicking the login button
+    //JTextFields
     private JTextField usernameT;
     private JTextField ipT;
     private JTextField portT;
-    private JLabel errorMessage;
-    ImageIcon icon = new ImageIcon("dependencies/Icon.png");
-    private int tempWidth;
 
-    private DefaultListModel msgs = new DefaultListModel();
+    //Icons
+    private ImageIcon icon;
+    private ImageIcon sendIcon;
 
+    /**
+     * main method to start and create the client
+     *
+     * @param args
+     */
     public static void main(String[] args) {
-
         new ChatClient().go();
     }
 
     /**
-     * Runs when client starts
+     * Runs when client starts, creates all the windows
      */
     public void go() {
+        //initialize and customize the frames
 
-        GridBagConstraints c = new GridBagConstraints();
+        //Chat Window Frame
         window = new JFrame("Mystic Messenger");
-        window.setBackground(new Color(70, 70, 70));
-        //set icon image
-
-        window.setIconImage(icon.getImage());
         window.setMinimumSize(new Dimension(625, 400));
-
-        southPanel = new JPanel();
-        southPanel.setBackground(new Color(70, 70, 70));
-        southPanel.setLayout(new GridBagLayout());
-
+        window.setBackground(new Color(70, 70, 70));
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // create buttons
-        ImageIcon sendIcon = new ImageIcon("dependencies/send_icon.png");
-        msgArea = new JPanel();
-        msgArea.setLayout(new BoxLayout(msgArea, BoxLayout.PAGE_AXIS));
+        window.setLocationRelativeTo(null); //centers the frame on the screen
+        //set icon image
+        icon = new ImageIcon("dependencies/Icon.png");
+        window.setIconImage(icon.getImage());
 
+        //Main Chat Window Panel
+        panel = new JPanel();
+        panel.setBackground(new Color(70, 70, 70));
+        //Uses GridBagLayout with GridBagConstraints
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        //Message Display Area
+        //create a new JPanel to display messages
+        msgArea = new JPanel();
+        msgArea.setLayout(new BoxLayout(msgArea, BoxLayout.PAGE_AXIS)); //uses BoxLayout that displays every component on a new row
+        //add the Message Area Panel to a Scroll Pane
         scrollPane = new JScrollPane(msgArea);
-//        scrollPane.setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        // scrollPane.setPreferredSize(new Dimension(370,500));
-        scrollPane.setMinimumSize(new Dimension(425, 300));
-//        c.ipady = 500;
-//        c.ipadx = 370;
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setMinimumSize(new Dimension(425, 300)); //makes sure this does not collapse when there are no messages
+        //GridBagConstraints
         c.fill = GridBagConstraints.BOTH;
-        //c.anchor = GridBagConstraints.LINE_START;
         c.insets = new Insets(0, 10, 2, 0);
         c.gridx = 2;
+        c.gridy = 3;
+        c.gridwidth = 2;
         c.weightx = 1.0;
         c.weighty = 1.0;
-        c.gridwidth = 2;
-        c.gridy = 3;
-        southPanel.add(scrollPane, c);
+        //add it to the main panel
+        panel.add(scrollPane, c);
 
-        // make message areas
-        typeField = new JTextField(90);
-        typeField.setForeground(new Color(250,250,250));
-        typeField.setOpaque(false);
-        typeField.setMinimumSize(new Dimension(350, 20));
+        //Type Field for Sending Messages
+        typeField = new JTextField();
+        typeField.setForeground(new Color(250, 250, 250)); //set text to white for visibility
+        typeField.setOpaque(false); //transparent
+        typeField.setMinimumSize(new Dimension(350, 20)); //prevents typeField from becoming a slit
+        //GridBagConstraints
+        c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 10, 5, 0);
         c.weightx = 1.0;
-        c.fill = GridBagConstraints.BOTH;
         c.weighty = 0.0;
-        c.anchor = (GridBagConstraints.CENTER);
         c.gridx = 2;
         c.gridy = 4;
         c.gridwidth = 1;
-        c.gridheight = 1;
-        southPanel.add(typeField, c);
+        c.anchor = GridBagConstraints.CENTER;
+        panel.add(typeField, c); //add to main panel
 
+
+        //Send Message Button
+        //Set Icon Image
+        sendIcon = new ImageIcon("dependencies/send_icon.png");
         sendButton = new JButton(sendIcon);
-        sendButton.addActionListener(new SendButtonListener());
+        sendButton.addActionListener(new SendButtonListener()); //add button listener for sending messages
         sendButton.setBorderPainted(false);
         sendButton.setContentAreaFilled(false);
-        sendButton.setMaximumSize(new Dimension(60, 60));
-        c.anchor = (GridBagConstraints.LAST_LINE_END);
+        sendButton.setMaximumSize(new Dimension(60, 60)); //prevents button space from becoming too big when the window is expanded
+        //GridBagConstraints
         c.weightx = 0.0;
+        c.weighty = 0.0;
         c.gridx = 3;
         c.gridy = 4;
-        southPanel.add(sendButton, c);
+        panel.add(sendButton, c); //add to main panel
 
-        //implement online list
-        onlineList = new ArrayList<>();
-        online = new JList(onlineList.toArray());
-        //online.setSelectionMode();
-        online.setMinimumSize(new Dimension(200, 400));
+        //List of Active/Online Users
+        onlineList = new ArrayList<>(); //create a string array of usernames of those online
+        online = new JList(onlineList.toArray()); //create a JList that displays the ArrayList
+        online.setMinimumSize(new Dimension(200, 400)); //Maintains size even if there is no one online, prevents collapse
+        //GridBagConstraints
         c.insets = new Insets(0, 10, 0, 0);
-        c.gridx = 1;
         c.weighty = 1.0;
         c.weightx = 1.0;
-        c.gridwidth = 1;
+        c.gridx = 1;
         c.gridy = 1;
+        c.gridwidth = 1;
         c.gridheight = 4;
-        c.fill = GridBagConstraints.BOTH;
-        southPanel.add(online, c);
-//         make client window
-        logon = new JDialog(window,"Mystic Messenger");
+        panel.add(online, c); //add to main panel
+
+        //Logon Window
+        logon = new JDialog(window, "Mystic Messenger");
         logon.setResizable(false);
-//        logon.setBackground(new Color(70,70,70));
-        logon.setIconImage(icon.getImage());
         logon.setSize(400, 380);
+        logon.setLayout(null); //no layout
+        logon.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        //centers the logon window relative to the main chat window
+        logon.setLocation(window.getX() + (window.getWidth() - logon.getWidth()) / 2, window.getY() + (window.getHeight() - logon.getHeight()) / 2);
 
-        logon.setLayout(null);
+        //Add Window Listener to make sure entire program stops if Logon is closed
+        logon.addWindowListener(new LoginCloseListener());
+        //Set Modality so that the main chat window is not visible when logging in
+        logon.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 
+        //set IconImage
+        logon.setIconImage(icon.getImage());
+
+        //Welcome JLabel
         welcome = new JLabel("Welcome!");
         welcome.setHorizontalAlignment(SwingConstants.CENTER);
         welcome.setBounds(30, 20, 330, 60);
-        welcome.setFont(new Font("Aileron", 0, 30));
         logon.add(welcome);
 
-        username = new JLabel("Nickname: ");
-        tempWidth = (int) username.getPreferredSize().getWidth();
+        //Username JLabel
+        username = new JLabel("Username: ");
         username.setBorder(null);
-        username.setBounds(30, 90, tempWidth, 30);
+        username.setBounds(30, 90, (int) username.getPreferredSize().getWidth(), 30);
         logon.add(username);
 
-
+        //Username JTextField
         usernameT = new JTextField();
         usernameT.setBounds(110, 90, 260, 30);
         logon.add(usernameT);
 
+        //IP Address JLabel
         ip = new JLabel("IP Address: ");
-        tempWidth = (int) ip.getPreferredSize().getWidth();
         ip.setBorder(null);
-        ip.setBounds(30, 130, tempWidth, 30);
+        ip.setBounds(30, 130, (int) ip.getPreferredSize().getWidth(), 30);
         logon.add(ip);
 
-
+        //IP Address JTextField
         ipT = new JTextField();
         ipT.setBounds(110, 130, 260, 30);
         logon.add(ipT);
 
+        //Port JLabel
         port = new JLabel("Port: ");
-        tempWidth = (int) port.getPreferredSize().getWidth();
         port.setBorder(null);
-        port.setBounds(30, 170, tempWidth, 30);
+        port.setBounds(30, 170, (int) ip.getPreferredSize().getWidth(), 30);
         logon.add(port);
 
+        //Port JTextField
         portT = new JTextField();
         portT.setBounds(110, 170, 260, 30);
         logon.add(portT);
 
-        errorMessage = new JLabel("");
+        //Error Message JLabel
+        errorMessage = new JLabel(""); //initially set to no text since there is no error yet
         errorMessage.setBounds(30, 260, 340, 40);
         errorMessage.setForeground(Color.red);
-
-        login = new JButton("Let's Go!");
-        tempWidth = (int) login.getPreferredSize().getWidth();
-        login.setBounds(30, 220, 340, 40);
-        login.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //somehow check name
-                if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
-                    errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
-                }
-                // boolean ugly = connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()));
-                //System.out.println(ugly);
-                if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
-                    errorMessage.setText("Username is already taken. Please enter a new username.");
-                    usernameT.setText("");
-                }
-                name = usernameT.getText();
-                System.out.println(name);
-                logon.dispose();
-                readMessagesFromServer();
-                window.setEnabled(true);
-            }
-        });
-        errorMessage.setVisible(true);
         logon.add(errorMessage);
+
+        //Login Button
+        login = new JButton("Let's Go!");
+        login.setBounds(30, 220, 340, 40); //Set to align with previous rows
+        login.addActionListener(new LoginListener());
         logon.add(login);
 
-        //logon.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-        logon.addWindowListener(new LoginCloseListener());
-        logon.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        logon.setFocusable(true);
-        logon.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
+        //Make sure the logon dialog window is visible
+        logon.setVisible(true);
 
-        window.setLocationRelativeTo(null);
-        logon.setLocation(window.getX()+(window.getWidth()-logon.getWidth())/2,window.getY()+(window.getHeight()-logon.getHeight())/2);
-       logon.setVisible(true);
+        //Add the main chat window panel to the frame
+        window.add(panel);
 
-        window.add(southPanel);
-
+        //Make sure the window is visible
         window.setVisible(true);
-        window.setEnabled(false);
     }
 
-    //Attempts to connect to the server and creates the socket and streams
+    /**
+     * Attempts to connect to the server and creates the socket and streams
+     *
+     * @param username Username of the client
+     * @param ip       IP Address used to connect to the socket
+     * @param port     Port used to connect to the socket
+     * @return true if successfully connected, false if username is not valid
+     */
     private boolean connect(String username, String ip, int port) {
         System.out.println("Attempting to make a connection..");
 
         try {
+            //If username is blank, return false
             if (username.length() == 0) {
                 return false;
             }
+
             mySocket = new Socket(ip, port); //attempt socket connection (local address). This will wait until a connection is made
 
             InputStreamReader stream1 = new InputStreamReader(mySocket.getInputStream()); //Stream for network input
             input = new BufferedReader(stream1);
             output = new PrintWriter(mySocket.getOutputStream()); //assign printwriter to network stream
 
-            // send username
+            //Send username
             System.out.println("username + " + username);
             output.println("username " + username);
             output.flush();
             try {
+                //Check if the username is valid and not in use
                 boolean nameValid = false;
                 while (!nameValid) {
                     if (input.ready()) {
                         String msg = input.readLine();
-                        // System.out.println("ready");
+                        //If the message is not valid, return false
                         if (!msg.equals("valid")) {
                             return false;
                         } else {
@@ -276,7 +299,6 @@ public class ChatClient {
 
     //Starts a loop waiting for server input and then displays it on the textArea
     public void readMessagesFromServer() {
-
         while (running) {  // loop unit a message is received
             try {
                 if (input.ready()) { //check for an incoming messge
@@ -288,16 +310,19 @@ public class ChatClient {
                             // add to side panel
                         } else {
                             String name = msg.substring(17);
+                            //??
                             // remove this client from side panel
                             //
                         }
                     } else if (msg.startsWith("error ")) {
                         msgArea.add(new Message(msg.substring(6)));
                     } else {
+                        //Actual message
                         msg = msg.substring(4);
                         String[] tokens = msg.split(": ");
                         String msgName = tokens[0];
                         String message = tokens[1];
+                        //Add message to message area
                         msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
                     }
 
@@ -315,8 +340,9 @@ public class ChatClient {
         } catch (Exception e) {
             System.out.println("Failed to close socket");
         }
-        window.dispose();
+        window.dispose(); //close window
     }
+
     //****** Inner Classes for Action Listeners ****
 
     // send - send msg to server (also flush), then clear the JTextField
@@ -329,43 +355,59 @@ public class ChatClient {
         }
     }
 
-    // QuitButtonListener - Quit the program
+    // login close - when login window is closed, makes sure program is terminated and main chat window is removed
     class LoginCloseListener implements WindowListener {
         @Override
         public void windowOpened(WindowEvent e) {
-
         }
 
         @Override
         public void windowClosing(WindowEvent e) {
-
         }
 
         @Override
         public void windowClosed(WindowEvent e) {
+            //Makes sure that if login is closed, the main chat window also closes and the program is stopped
             window.dispose();
         }
 
         @Override
         public void windowIconified(WindowEvent e) {
-
         }
 
         @Override
         public void windowDeiconified(WindowEvent e) {
-
         }
 
         @Override
         public void windowActivated(WindowEvent e) {
-
         }
 
         @Override
         public void windowDeactivated(WindowEvent e) {
-
         }
     }
 
+    class LoginListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //Check for Errors
+            //If fields are left blank
+            if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
+                errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
+            }
+
+            //Other possible error is that the username has been already taken
+            if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
+                errorMessage.setText("Username is already taken. Please enter a new username.");
+                usernameT.setText("");
+            }
+
+            //No Error:
+            name = usernameT.getText();
+            logon.dispose(); //close Logon Window
+            readMessagesFromServer(); //Starts to wait for messsages from the server
+        }
+    }
 
 }
