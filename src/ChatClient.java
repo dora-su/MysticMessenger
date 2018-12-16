@@ -13,10 +13,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -171,14 +168,14 @@ public class ChatClient {
         logon.setResizable(false);
         logon.setSize(400, 380);
         logon.setLayout(null); //no layout
-        logon.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        logon.addWindowListener(new WindowAdapter() { //closes program upon closing dialog box
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
         //centers the logon window relative to the main chat window
         logon.setLocation(window.getX() + (window.getWidth() - logon.getWidth()) / 2, window.getY() + (window.getHeight() - logon.getHeight()) / 2);
-
-        //Add Window Listener to make sure entire program stops if Logon is closed
-        logon.addWindowListener(new LoginCloseListener());
-        //Set Modality so that the main chat window is not visible when logging in
-        logon.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 
         //set IconImage
         logon.setIconImage(icon.getImage());
@@ -239,9 +236,6 @@ public class ChatClient {
 
         //Add the main chat window panel to the frame
         window.add(panel);
-
-        //Make sure the window is visible
-        window.setVisible(true);
     }
 
     /**
@@ -290,6 +284,7 @@ public class ChatClient {
             }
         } catch (IOException e) {  //connection error occured
             System.out.println("Connection to Server Failed");
+            errorMessage.setText("Connection failed.");
             e.printStackTrace();
         }
 
@@ -355,39 +350,6 @@ public class ChatClient {
         }
     }
 
-    // login close - when login window is closed, makes sure program is terminated and main chat window is removed
-    class LoginCloseListener implements WindowListener {
-        @Override
-        public void windowOpened(WindowEvent e) {
-        }
-
-        @Override
-        public void windowClosing(WindowEvent e) {
-        }
-
-        @Override
-        public void windowClosed(WindowEvent e) {
-            //Makes sure that if login is closed, the main chat window also closes and the program is stopped
-            window.dispose();
-        }
-
-        @Override
-        public void windowIconified(WindowEvent e) {
-        }
-
-        @Override
-        public void windowDeiconified(WindowEvent e) {
-        }
-
-        @Override
-        public void windowActivated(WindowEvent e) {
-        }
-
-        @Override
-        public void windowDeactivated(WindowEvent e) {
-        }
-    }
-
     class LoginListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -401,12 +363,12 @@ public class ChatClient {
             if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
                 errorMessage.setText("Username is already taken. Please enter a new username.");
                 usernameT.setText("");
+            } else {
+                //No Error:
+                name = usernameT.getText();
+                readMessagesFromServer(); //Starts to wait for messsages from the server
+                window.setVisible(true); //makes main window visible
             }
-
-            //No Error:
-            name = usernameT.getText();
-            logon.dispose(); //close Logon Window
-            readMessagesFromServer(); //Starts to wait for messsages from the server
         }
     }
 
