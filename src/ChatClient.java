@@ -9,6 +9,8 @@ import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,8 +35,7 @@ public class ChatClient {
     private JFrame window;
     private String name = "woah";
 
-    private JFrame logon;
-    private JPanel logonScreen;
+    private JDialog logon;
     private JLabel welcome;
     private JButton login;
     private JLabel username;
@@ -58,139 +59,7 @@ public class ChatClient {
      * Runs when client starts
      */
     public void go() {
-//         make client window
-        logon = new JFrame("Mystic Messenger");
-        logon.setResizable(false);
-//        logon.setBackground(new Color(70,70,70));
-        logon.setIconImage(icon.getImage());
-        logon.setSize(400, 380);
-        logonScreen = new JPanel();
 
-
-        logonScreen.setLayout(null);
-
-        welcome = new JLabel("Welcome!");
-        welcome.setHorizontalAlignment(SwingConstants.CENTER);
-        welcome.setBounds(30, 20, 330, 60);
-        welcome.setFont(new Font("Aileron", 0, 30));
-        logonScreen.add(welcome);
-
-        username = new JLabel("Nickname: ");
-        tempWidth = (int) username.getPreferredSize().getWidth();
-        username.setBorder(null);
-        username.setBounds(30, 90, tempWidth, 30);
-        logonScreen.add(username);
-
-
-        usernameT = new JTextField();
-        usernameT.setBounds(110, 90, 260, 30);
-        logonScreen.add(usernameT);
-
-        ip = new JLabel("IP Address: ");
-        tempWidth = (int) ip.getPreferredSize().getWidth();
-        ip.setBorder(null);
-        ip.setBounds(30, 130, tempWidth, 30);
-        logonScreen.add(ip);
-
-
-        ipT = new JTextField();
-        ipT.setBounds(110, 130, 260, 30);
-        logonScreen.add(ipT);
-
-        port = new JLabel("Port: ");
-        tempWidth = (int) port.getPreferredSize().getWidth();
-        port.setBorder(null);
-        port.setBounds(30, 170, tempWidth, 30);
-        logonScreen.add(port);
-
-        portT = new JTextField();
-        portT.setBounds(110, 170, 260, 30);
-        logonScreen.add(portT);
-
-        errorMessage = new JLabel("");
-        errorMessage.setBounds(30, 260, 340, 40);
-        errorMessage.setForeground(Color.red);
-
-
-        login = new JButton("Let's Go!");
-        tempWidth = (int) login.getPreferredSize().getWidth();
-        login.setBounds(30, 220, 340, 40);
-        login.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //somehow check name
-                if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
-                    errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
-                }
-                // boolean ugly = connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()));
-                //System.out.println(ugly);
-                if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
-                    errorMessage.setText("Username is already taken. Please enter a new username.");
-                    usernameT.setText("");
-                    System.out.println("ugly");
-                }
-                name = usernameT.getText();
-                System.out.println(name);
-                logon.dispose();
-                chatWindow();
-            }
-        });
-        errorMessage.setVisible(true);
-        logonScreen.add(errorMessage);
-        logonScreen.add(login);
-
-        logon.add(logonScreen);
-
-        logon.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        logon.setFocusable(true);
-        logon.setVisible(true);
-
-    }
-
-    //Attempts to connect to the server and creates the socket and streams
-    private boolean connect(String username, String ip, int port) {
-        System.out.println("Attempting to make a connection..");
-
-        try {
-            if (username.length() == 0) {
-                return false;
-            }
-            mySocket = new Socket(ip, port); //attempt socket connection (local address). This will wait until a connection is made
-
-            InputStreamReader stream1 = new InputStreamReader(mySocket.getInputStream()); //Stream for network input
-            input = new BufferedReader(stream1);
-            output = new PrintWriter(mySocket.getOutputStream()); //assign printwriter to network stream
-
-            // send username
-            System.out.println("username + " + username);
-            output.println("username " + username);
-            output.flush();
-            try {
-                boolean nameValid = false;
-                while (!nameValid) {
-                    if (input.ready()) {
-                        String msg = input.readLine();
-                        // System.out.println("ready");
-                        if (!msg.equals("valid")) {
-                            return false;
-                        } else {
-                            nameValid = true;
-                        }
-                    }
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        } catch (IOException e) {  //connection error occured
-            System.out.println("Connection to Server Failed");
-            e.printStackTrace();
-        }
-
-        System.out.println("Connection made.");
-        return true;
-    }
-
-    private void chatWindow() {
         GridBagConstraints c = new GridBagConstraints();
         window = new JFrame("Mystic Messenger");
         window.setBackground(new Color(70, 70, 70));
@@ -267,6 +136,147 @@ public class ChatClient {
         c.gridheight = 4;
         c.fill = GridBagConstraints.BOTH;
         southPanel.add(online, c);
+//         make client window
+        logon = new JDialog(window,"Mystic Messenger");
+        logon.setResizable(false);
+//        logon.setBackground(new Color(70,70,70));
+        logon.setIconImage(icon.getImage());
+        logon.setSize(400, 380);
+
+
+        logon.setLayout(null);
+
+        welcome = new JLabel("Welcome!");
+        welcome.setHorizontalAlignment(SwingConstants.CENTER);
+        welcome.setBounds(30, 20, 330, 60);
+        welcome.setFont(new Font("Aileron", 0, 30));
+        logon.add(welcome);
+
+        username = new JLabel("Nickname: ");
+        tempWidth = (int) username.getPreferredSize().getWidth();
+        username.setBorder(null);
+        username.setBounds(30, 90, tempWidth, 30);
+        logon.add(username);
+
+
+        usernameT = new JTextField();
+        usernameT.setBounds(110, 90, 260, 30);
+        logon.add(usernameT);
+
+        ip = new JLabel("IP Address: ");
+        tempWidth = (int) ip.getPreferredSize().getWidth();
+        ip.setBorder(null);
+        ip.setBounds(30, 130, tempWidth, 30);
+        logon.add(ip);
+
+
+        ipT = new JTextField();
+        ipT.setBounds(110, 130, 260, 30);
+        logon.add(ipT);
+
+        port = new JLabel("Port: ");
+        tempWidth = (int) port.getPreferredSize().getWidth();
+        port.setBorder(null);
+        port.setBounds(30, 170, tempWidth, 30);
+        logon.add(port);
+
+        portT = new JTextField();
+        portT.setBounds(110, 170, 260, 30);
+        logon.add(portT);
+
+        errorMessage = new JLabel("");
+        errorMessage.setBounds(30, 260, 340, 40);
+        errorMessage.setForeground(Color.red);
+
+
+        login = new JButton("Let's Go!");
+        tempWidth = (int) login.getPreferredSize().getWidth();
+        login.setBounds(30, 220, 340, 40);
+        login.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //somehow check name
+                if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
+                    errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
+                }
+                // boolean ugly = connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()));
+                //System.out.println(ugly);
+                if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
+                    errorMessage.setText("Username is already taken. Please enter a new username.");
+                    usernameT.setText("");
+                    System.out.println("ugly");
+                }
+                name = usernameT.getText();
+                System.out.println(name);
+                logon.dispose();
+                window.setEnabled(true);
+            }
+        });
+        errorMessage.setVisible(true);
+        logon.add(errorMessage);
+        logon.add(login);
+
+        //logon.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+        logon.addWindowListener(new LoginCloseListener());
+        logon.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        logon.setFocusable(true);
+        logon.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
+
+        window.setLocationRelativeTo(null);
+        logon.setLocation(window.getX()+(window.getWidth()-logon.getWidth())/2,window.getY()+(window.getHeight()-logon.getHeight())/2);
+       logon.setVisible(true);
+
+        window.add(southPanel);
+
+        window.setVisible(true);
+        window.setEnabled(false);
+    }
+
+    //Attempts to connect to the server and creates the socket and streams
+    private boolean connect(String username, String ip, int port) {
+        System.out.println("Attempting to make a connection..");
+
+        try {
+            if (username.length() == 0) {
+                return false;
+            }
+            mySocket = new Socket(ip, port); //attempt socket connection (local address). This will wait until a connection is made
+
+            InputStreamReader stream1 = new InputStreamReader(mySocket.getInputStream()); //Stream for network input
+            input = new BufferedReader(stream1);
+            output = new PrintWriter(mySocket.getOutputStream()); //assign printwriter to network stream
+
+            // send username
+            System.out.println("username + " + username);
+            output.println("username " + username);
+            output.flush();
+            try {
+                boolean nameValid = false;
+                while (!nameValid) {
+                    if (input.ready()) {
+                        String msg = input.readLine();
+                        // System.out.println("ready");
+                        if (!msg.equals("valid")) {
+                            return false;
+                        } else {
+                            nameValid = true;
+                        }
+                    }
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } catch (IOException e) {  //connection error occured
+            System.out.println("Connection to Server Failed");
+            e.printStackTrace();
+        }
+
+        System.out.println("Connection made.");
+        return true;
+    }
+
+    private void chatWindow() {
+
 //
 //        clearButton = new JButton("QUIT");
 //        clearButton.addActionListener(new QuitButtonListener());
@@ -283,8 +293,6 @@ public class ChatClient {
         window.add(southPanel);
 
         // set window size
-        window.setSize(350, 400);
-        window.setVisible(true);
 
         // call a method that connects to the server
 
@@ -311,7 +319,7 @@ public class ChatClient {
                             //
                         }
                     } else if (msg.startsWith("error ")) {
-                        msgArea.add(new Message(msg.substring(6)));
+                      //  msgArea.add(new Message(msg.substring(6)));
                     } else {
                         msg = msg.substring(4);
                         String[] tokens = msg.split(": ");
@@ -349,9 +357,40 @@ public class ChatClient {
     }
 
     // QuitButtonListener - Quit the program
-    class QuitButtonListener implements ActionListener {
-        public void actionPerformed(ActionEvent event) {
-            running = false;
+    class LoginCloseListener implements WindowListener {
+        @Override
+        public void windowOpened(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+            window.dispose();
+        }
+
+        @Override
+        public void windowIconified(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowDeiconified(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowActivated(WindowEvent e) {
+
+        }
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+
         }
     }
 
