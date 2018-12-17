@@ -365,9 +365,10 @@ public class ChatClient {
                 usernameT.setText("");
             } else {
                 //No Error:
-                name = usernameT.getText();
-                readMessagesFromServer(); //Starts to wait for messsages from the server
+                window.add(panel);
                 window.setVisible(true); //makes main window visible
+                readMessagesFromServer(); //Starts to wait for messsages from the server
+
             }
         }
     }
