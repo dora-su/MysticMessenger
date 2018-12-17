@@ -6,7 +6,7 @@
 
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
-import java.awt.Color;
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -33,7 +33,7 @@ public class Message extends JTextPane {
         now = LocalDateTime.now();
 
         //Set the text to the message with a line break that shows the sender & date/time on the next line
-        this.setText("<html><font size=+1>" + message + "</font><br><p><b><font size=-1>" + name + "</b> @ " + "<i>" + dtf.format(now) + "</i><br></p></html>");
+        this.setText("<html><font size=+1>" + message + "</font><br><p><b><font size=-1>" + name + "</b> @ " + "<i>" + dtf.format(now) + "</i></p></html>");
 
         //Checks if message was sent by the client that message is displayed
         if (isSelf) {
@@ -43,6 +43,9 @@ public class Message extends JTextPane {
             //Set colour to darker blue if it was a message sent by another user
             this.setBackground(new Color(176, 224, 230));
         }
+
+        this.setSize(425,10);
+//        this.setPreferredSize(new Dimension(425,this.getPreferredSize().height));
     }
 
     /**

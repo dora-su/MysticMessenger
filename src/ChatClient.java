@@ -26,7 +26,7 @@ public class ChatClient {
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
     private PrintWriter output;  //printwriter for network output
-    private boolean running; //thread status via boolean
+    private boolean running=true; //thread status via boolean
 
     private String name = ""; //username
 
