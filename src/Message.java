@@ -46,6 +46,7 @@ public class Message extends JTextPane {
 
         this.setSize(425,10);
 //        this.setPreferredSize(new Dimension(425,this.getPreferredSize().height));
+        this.setVisible(true);
     }
 
     /**
@@ -66,6 +67,7 @@ public class Message extends JTextPane {
 
         //Sets text to the error message followed by the time of the error on the next line
         this.setText("<html><font size=-1>" + error + "</font><br><p><font size=-1>" + "<i>" + dtf.format(now) + "</i><br></p></html>");
+        this.setVisible(true);
     }
 
 }

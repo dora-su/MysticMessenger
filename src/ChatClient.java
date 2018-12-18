@@ -101,6 +101,7 @@ public class ChatClient {
         msgArea = new JPanel();
         msgArea.setLayout(new BoxLayout(msgArea, BoxLayout.PAGE_AXIS)); //uses BoxLayout that displays every component on a new row
         //add the Message Area Panel to a Scroll Pane
+        msgArea.setVisible(true);
         scrollPane = new JScrollPane(msgArea);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -199,8 +200,9 @@ public class ChatClient {
         errorMessage.setBounds(30, 260, 340, 40);
         errorMessage.setForeground(Color.red);
 
-        UIManager.put("OptionPane.minimumSize", new Dimension(300, 250));
+//        UIManager.put("OptionPane.minimumSize", new Dimension(300, 250));
 
+        UIManager.put("OptionPane.minimumSize", new Dimension(530, 250));
         Object[] fields = {
                 welcome,
                 username, usernameT,
@@ -211,8 +213,8 @@ public class ChatClient {
         Object[] buttons = {"Quit", "Let's Go"};
 
         while (!loggedIn) { //as long as they have not logged in yet, keep creating the option pane
-            option = JOptionPane.showOptionDialog(window, fields, "Mystic Messenger", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, buttons, null);
-            if (option == JOptionPane.YES_OPTION) {
+            option = JOptionPane.showOptionDialog(window, fields, "Mystic Messenger", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, icon, buttons, null);
+            if ((option == JOptionPane.YES_OPTION) || (option == JOptionPane.CLOSED_OPTION)) {
                 System.exit(0);
             } else {
                 if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
@@ -228,11 +230,11 @@ public class ChatClient {
                     //Add the main chat window panel to the frame
                     window.add(panel);
                     window.setVisible(true); //makes main window visible
-                    readMessagesFromServer(); //Starts to wait for messsages from the server
-                    break;
+                    loggedIn = true;
                 }
             }
         }
+        readMessagesFromServer(); //Starts to wait for messsages from the server
     }
 
     /**
@@ -317,6 +319,7 @@ public class ChatClient {
                         //Add message to message area
                         msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
                     }
+                    msgArea.revalidate();
 
                 }
 
