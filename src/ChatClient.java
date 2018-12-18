@@ -1,4 +1,6 @@
-/** [ChatClient.java]
+/**
+ * [ChatClient.java]
+ *
  * @author Chris Xie & Dora Su
  * Version: 2.0
  * Date: December 14, 2018
@@ -31,6 +33,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -45,6 +48,12 @@ public class ChatClient {
     private boolean loggedIn = false;
 
     private String name = ""; //username
+
+    //Audio
+    //Clips
+    private Sound windowOpen;
+    private Sound send;
+    private Sound incoming;
 
     //chat window components
     //JButtons
@@ -89,11 +98,15 @@ public class ChatClient {
 
     /**
      * Runs when client starts, creates all the windows
-     * initializes all components
+     * initializes all components and sounds
      */
     public void go() {
-        //initialize and customize the frames
+        //Initialize sound
+        windowOpen = new Sound("windowopened");
+        send = new Sound("send");
+        incoming = new Sound("incoming");
 
+        //initialize and customize the frames
         //Chat Window Frame
         window = new JFrame("Mystic Messenger");
         window.setMinimumSize(new Dimension(625, 400));
@@ -243,6 +256,10 @@ public class ChatClient {
                     usernameT.setText("");
                 } else {
                     //No Error:
+                    //Play the welcome opening window sound
+                    windowOpen.play();
+                    //Set the name of this client to the text in the username field
+                    name = usernameT.getText();
                     //Add the main chat window panel to the frame
                     window.add(panel);
                     window.setVisible(true); //makes main window visible
@@ -346,6 +363,9 @@ public class ChatClient {
                         //Add message to message area
                         //boolean determines whether the specific client sent it, differentiates colours depending on who sent it
                         msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
+                        if(!msgName.equals(this.name)){ //if this client was not the sender of the message, play the incoming sound notification
+                            incoming.play(); //play the incoming message sound
+                        }
                     }
                     msgArea.revalidate(); //updates the Message area to show new messages
                 }
@@ -363,7 +383,6 @@ public class ChatClient {
             System.out.println("Failed to close socket");
         }
         window.dispose(); //close window
-
     }
 
     /**
@@ -372,6 +391,7 @@ public class ChatClient {
     class SendButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             //Send a message to the client
+            send.play(); //play the send message sound
             output.println("msg " + typeField.getText());
             output.flush();
             typeField.setText(""); //reset text field
@@ -383,9 +403,10 @@ public class ChatClient {
      */
     class TextFieldListener extends KeyAdapter {
         @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER){
+        public void keyPressed(KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.VK_ENTER) {
                 //Send a message to the client
+                send.play(); //play the send message sound
                 output.println("msg " + typeField.getText());
                 output.flush();
                 typeField.setText("");
