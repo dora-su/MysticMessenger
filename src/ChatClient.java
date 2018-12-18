@@ -1,25 +1,40 @@
-/* [ChatClient.java]
- * Simple chat client
- * @author Dora Su & Chris Xie
- * @ version 1.0a
+/** [ChatClient.java]
+ * @author Chris Xie & Dora Su
+ * Version: 2.0
+ * Date: December 14, 2018
+ * Simple chat client that allows user to connect to the server, send/receive messages
  */
 
-import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import java.awt.Color;
-import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ChatClient {
     //Server Variables
@@ -66,7 +81,6 @@ public class ChatClient {
 
     /**
      * main method to start and create the client
-     *
      * @param args
      */
     public static void main(String[] args) {
@@ -75,6 +89,7 @@ public class ChatClient {
 
     /**
      * Runs when client starts, creates all the windows
+     * initializes all components
      */
     public void go() {
         //initialize and customize the frames
@@ -155,7 +170,6 @@ public class ChatClient {
         //List of Active/Online Users
         onlineList = new DefaultListModel<>(); //create a default list model: array of usernames of those online
         online = new JList(onlineList); //create a JList that displays the onlineList
-//        online.setFont(new Font(null,welcome));
         online.setMinimumSize(new Dimension(200, 400)); //Maintains size even if there is no one online, prevents collapse
         //GridBagConstraints
         c.insets = new Insets(0, 10, 0, 0);
@@ -204,8 +218,6 @@ public class ChatClient {
         errorMessage.setBounds(30, 260, 340, 40);
         errorMessage.setForeground(Color.red);
 
-//        UIManager.put("OptionPane.minimumSize", new Dimension(300, 250));
-
         UIManager.put("OptionPane.minimumSize", new Dimension(530, 250));
         Object[] fields = {
                 welcome,
@@ -234,7 +246,7 @@ public class ChatClient {
                     //Add the main chat window panel to the frame
                     window.add(panel);
                     window.setVisible(true); //makes main window visible
-                    loggedIn = true;
+                    loggedIn = true; //quit this loop
                 }
             }
         }
@@ -295,7 +307,9 @@ public class ChatClient {
         return true;
     }
 
-    //Starts a loop waiting for server input and then displays it on the textArea
+    /**
+     * starts a loop waiting for server input and then displays it on the textArea
+     */
     public void readMessagesFromServer() {
         window.addWindowListener(new WindowAdapter() {
             @Override
@@ -314,29 +328,23 @@ public class ChatClient {
 
                     if (msg.startsWith("client ")) {
                         System.out.println(msg);
-                        if (msg.substring(7).startsWith("add ")) {
+                        if (msg.substring(7).startsWith("add ")) { //new person online, add to onlineList
                             String name = msg.substring(11); // name of client
-                            onlineList.addElement(name);
-                            System.out.println(name + " add");
-                            // add to side panel
-                        } else {
+                            onlineList.addElement(name); //add to list
+                        } else { //someone left the chat, remove from onlineList
                             String name = msg.substring(14); // name of client that left
-                            System.out.println(name);
-                            onlineList.removeElement(name);
-                            //??
-                            // remove this client from side panel
-                            //
-                            //
+                            onlineList.removeElement(name); //remove from list
                         }
-                    } else if (msg.startsWith("error ")) {
-                        msgArea.add(new Message(msg.substring(6)));
+                    } else if (msg.startsWith("error ")) { //error messages
+                        msgArea.add(new Message(msg.substring(6))); //special message constructor for error messages
                     } else {
-                        //Actual message
+                        //Actual message sent by someone
                         System.out.println(msg);
                         String[] tokens = msg.split(": ");
                         String msgName = tokens[0];
                         String message = tokens[1];
                         //Add message to message area
+                        //boolean determines whether the specific client sent it, differentiates colours depending on who sent it
                         msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
                     }
                     msgArea.revalidate(); //updates the Message area to show new messages
@@ -358,18 +366,21 @@ public class ChatClient {
 
     }
 
-    //****** Inner Classes for Action Listeners ****
-
-    // send - send msg to server (also flush), then clear the JTextField
+    /**
+     * send - send msg to server (also flush), then clear the JTextField
+     */
     class SendButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             //Send a message to the client
             output.println("msg " + typeField.getText());
             output.flush();
-            typeField.setText("");
+            typeField.setText(""); //reset text field
         }
     }
-    // textfield - when enter is clicked in the textfield, it will do the same thing as clicking the send button, makes sending messages easier
+
+    /**
+     * textfield - when enter is clicked in the textfield, it will do the same thing as clicking the send button, makes sending messages easier
+     */
     class TextFieldListener extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {

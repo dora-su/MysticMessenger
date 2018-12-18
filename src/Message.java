@@ -1,7 +1,8 @@
-/* [Message.java]
- * Formats messages as a JTextPane, allows easy display of messages
+/** [Message.java]
  * @author Dora Su
- * 14 December 2018
+ * Version: 2.0
+ * Date: December 14, 2018
+ * Formats messages as a JTextPane, allows easy display of messages
  */
 
 import javax.swing.JTextPane;
