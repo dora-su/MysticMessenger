@@ -43,12 +43,12 @@ public class ChatClient {
     private JPanel msgArea;//panel messages are displayed on
     //JLists and ArrayLists
     private JList online;
-    private ArrayList<String> onlineList;
+    private DefaultListModel<String> onlineList;
     //JFrames
     private JFrame window; //frame for displaying everything
 
     //logon option pane
-    int option;
+    int option; //clicked result from the JOptionPane
     //JLabels
     private JLabel welcome;
     private JLabel username;
@@ -85,6 +85,7 @@ public class ChatClient {
         window.setBackground(new Color(70, 70, 70));
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null); //centers the frame on the screen
+        window.getRootPane().setDefaultButton(sendButton); //allows send to be automatically clicked when enter is pressed
         //set icon image
         icon = new ImageIcon("dependencies/Icon.png");
         window.setIconImage(icon.getImage());
@@ -122,6 +123,7 @@ public class ChatClient {
         typeField.setForeground(new Color(250, 250, 250)); //set text to white for visibility
         typeField.setOpaque(false); //transparent
         typeField.setMinimumSize(new Dimension(350, 20)); //prevents typeField from becoming a slit
+        typeField.addKeyListener(new TextFieldListener());
         //GridBagConstraints
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 10, 5, 0);
@@ -139,10 +141,11 @@ public class ChatClient {
         sendIcon = new ImageIcon("dependencies/send_icon.png");
         sendButton = new JButton(sendIcon);
         sendButton.addActionListener(new SendButtonListener()); //add button listener for sending messages
-        sendButton.setBorderPainted(false);
+        sendButton.setBorder(null);
         sendButton.setContentAreaFilled(false);
-        sendButton.setMaximumSize(new Dimension(60, 60)); //prevents button space from becoming too big when the window is expanded
+        sendButton.setMaximumSize(new Dimension(80, 80)); //prevents button space from becoming too big when the window is expanded
         //GridBagConstraints
+        c.insets = new Insets(10, 10, 10, 10);
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.gridx = 3;
@@ -150,8 +153,9 @@ public class ChatClient {
         panel.add(sendButton, c); //add to main panel
 
         //List of Active/Online Users
-        onlineList = new ArrayList<>(); //create a string array of usernames of those online
-        online = new JList(onlineList.toArray()); //create a JList that displays the ArrayList
+        onlineList = new DefaultListModel<>(); //create a default list model: array of usernames of those online
+        online = new JList(onlineList); //create a JList that displays the onlineList
+//        online.setFont(new Font(null,welcome));
         online.setMinimumSize(new Dimension(200, 400)); //Maintains size even if there is no one online, prevents collapse
         //GridBagConstraints
         c.insets = new Insets(0, 10, 0, 0);
@@ -312,11 +316,13 @@ public class ChatClient {
                         System.out.println(msg);
                         if (msg.substring(7).startsWith("add ")) {
                             String name = msg.substring(11); // name of client
+                            onlineList.addElement(name);
                             System.out.println(name + " add");
                             // add to side panel
                         } else {
                             String name = msg.substring(14); // name of client that left
                             System.out.println(name);
+                            onlineList.removeElement(name);
                             //??
                             // remove this client from side panel
                             //
@@ -333,8 +339,7 @@ public class ChatClient {
                         //Add message to message area
                         msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
                     }
-                    msgArea.revalidate();
-
+                    msgArea.revalidate(); //updates the Message area to show new messages
                 }
 
             } catch (IOException e) {
@@ -362,6 +367,18 @@ public class ChatClient {
             output.println("msg " + typeField.getText());
             output.flush();
             typeField.setText("");
+        }
+    }
+    // textfield - when enter is clicked in the textfield, it will do the same thing as clicking the send button, makes sending messages easier
+    class TextFieldListener extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                //Send a message to the client
+                output.println("msg " + typeField.getText());
+                output.flush();
+                typeField.setText("");
+            }
         }
     }
 }

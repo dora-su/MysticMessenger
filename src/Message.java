@@ -6,7 +6,7 @@
 
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.Color;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,7 +23,7 @@ public class Message extends JTextPane {
      * @param isSelf  boolean to check if the message was sent by the client him/herself, used for display differences
      */
     public Message(String name, String message, boolean isSelf) {
-        this.setBorder(new EmptyBorder(10, 5, 10, 5)); //Padding for the message
+        this.setBorder(new EmptyBorder(7, 5, 7, 5)); //Padding for the message
         this.setForeground(new Color(70, 70, 70)); //Set text colour
         this.setOpaque(true);
         this.setEditable(false); //prevents editing of text
@@ -33,7 +33,7 @@ public class Message extends JTextPane {
         now = LocalDateTime.now();
 
         //Set the text to the message with a line break that shows the sender & date/time on the next line
-        this.setText("<html><font size=+1>" + message + "</font><br><p><b><font size=-1>" + name + "</b> @ " + "<i>" + dtf.format(now) + "</i></p></html>");
+        this.setText("<html><font size=+1>" + message + "</font><br><b><font size=-1>" + name + "</b> @ " + "<i>" + dtf.format(now) + "</i></html>");
 
         //Checks if message was sent by the client that message is displayed
         if (isSelf) {
@@ -55,7 +55,7 @@ public class Message extends JTextPane {
      * @param error error message
      */
     public Message(String error) {
-        this.setBorder(new EmptyBorder(10, 5, 10, 5)); //Padding for the message
+        this.setBorder(new EmptyBorder(7, 5, 7, 5)); //Padding for the message
         this.setForeground(new Color(70, 70, 70)); //Set text colour
         this.setBackground(new Color(249, 200, 199)); //Set the background to a soft red colour
         this.setOpaque(true);
@@ -66,7 +66,7 @@ public class Message extends JTextPane {
         now = LocalDateTime.now();
 
         //Sets text to the error message followed by the time of the error on the next line
-        this.setText("<html><font size=-1>" + error + "</font><br><p><font size=-1>" + "<i>" + dtf.format(now) + "</i><br></p></html>");
+        this.setText("<html><font size=-1>" + error + "</font><br><font size=-1>" + "<i>" + dtf.format(now) + "</i></html>");
         this.setVisible(true);
     }
 
