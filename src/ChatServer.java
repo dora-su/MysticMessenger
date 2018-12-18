@@ -98,12 +98,13 @@ public class ChatServer {
                 for (int i = 0; i < clients.size(); i++) {
                     //make sure they have username
                     if (clients.get(i).getName() != null) {
-                        clients.get(i).send(name, msg);
+                        clients.get(i).send(name, msg.substring(4));
                     }
                 }
             }
         } else if (msg.startsWith("client ")) { // list of online clients
             for (ConnectionHandler i : clients) {
+                System.out.println("msg");
                 i.sendClient(msg);
             }
         }
@@ -163,7 +164,7 @@ public class ChatServer {
             while (!nameSet) {
                 try {
                     if (input.ready()) {
-                        String name = input.readLine().substring(10);
+                        String name = input.readLine().substring(9);
                         if (usableName(name)) {
                             this.name = name;
                             nameSet = true;
@@ -178,14 +179,19 @@ public class ChatServer {
                     e.printStackTrace();
                 }
             }
-
+            System.out.println(name);
+            server.handle("client add " + name, name);
             //Get a message from the client
             while (running) {  // loop unit a message is received
 
                 try {
                     if (input.ready()) { //check for an incoming messge
                         msg = input.readLine();  //get a message from the client
-                        server.handle(msg, this.name);
+                        if (msg.equals("client leave")) {
+                            running = false;
+                        } else {
+                            server.handle(msg, this.name);
+                        }
                     }
                 } catch (IOException e) {
                     System.out.println("Failed to receive msg from the client");
@@ -193,15 +199,12 @@ public class ChatServer {
                 }
             }
 
-            //Send a message to the client
-            output.println("We got your message! Goodbye.");
-            output.flush();
-
             //close the socket
             try {
                 input.close();
                 output.close();
                 client.close();
+                server.handle("client remove " + name, name);
             } catch (Exception e) {
                 System.out.println("Failed to close socket");
             }

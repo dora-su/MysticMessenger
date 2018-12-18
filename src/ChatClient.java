@@ -293,26 +293,40 @@ public class ChatClient {
 
     //Starts a loop waiting for server input and then displays it on the textArea
     public void readMessagesFromServer() {
+        window.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                System.out.println("left");
+                output.println("client leave");
+                output.flush();
+                running = false;
+            }
+        });
         while (running) {  // loop unit a message is received
             try {
                 if (input.ready()) { //check for an incoming messge
                     String msg = input.readLine();
 
                     if (msg.startsWith("client ")) {
+                        System.out.println(msg);
                         if (msg.substring(7).startsWith("add ")) {
-                            String name = msg.substring(11);
+                            String name = msg.substring(11); // name of client
+                            System.out.println(name + " add");
                             // add to side panel
                         } else {
-                            String name = msg.substring(17);
+                            String name = msg.substring(14); // name of client that left
+                            System.out.println(name);
                             //??
                             // remove this client from side panel
+                            //
                             //
                         }
                     } else if (msg.startsWith("error ")) {
                         msgArea.add(new Message(msg.substring(6)));
                     } else {
                         //Actual message
-                        msg = msg.substring(4);
+                        System.out.println(msg);
                         String[] tokens = msg.split(": ");
                         String msgName = tokens[0];
                         String message = tokens[1];
@@ -332,10 +346,11 @@ public class ChatClient {
             input.close();
             output.close();
             mySocket.close();
-        } catch (Exception e) {
+        } catch (Exception e1) {
             System.out.println("Failed to close socket");
         }
         window.dispose(); //close window
+
     }
 
     //****** Inner Classes for Action Listeners ****
