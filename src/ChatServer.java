@@ -1,7 +1,9 @@
-/* [ChatServer.java]
- * You will need to modify this so that received messages are broadcast to all clients
- * @author Mangat
- * @ version 1.0a
+/*
+    ChatServer.java
+    Version: 2.0
+    Author: Chris Xie
+    Date: December 14, 2018
+    Runs a server that clients can connect to
  */
 
 //imports for network communication
@@ -18,7 +20,7 @@ public class ChatServer {
 
     ServerSocket serverSock;// server socket for connection
     static Boolean running = true;  // controls if the server is accepting clients
-    private ArrayList<ConnectionHandler> clients = new ArrayList<ConnectionHandler>();
+    private ArrayList<ConnectionHandler> clients = new ArrayList<ConnectionHandler>(); // list of all the clients
 
     /**
      * Main
@@ -29,11 +31,11 @@ public class ChatServer {
         new ChatServer().go(); //start the server
     }
 
-    /**
+    /*
      * Go
      * Starts the server
      */
-    public void go() {
+    private void go() {
         System.out.println("Waiting for a client connection..");
 
         Socket client = null;//hold the client connection
@@ -63,19 +65,20 @@ public class ChatServer {
         }
     }
 
-    /**
+    /*
      * Processes a message to determine if it is a command or a normal message, and sends it to clients accordingly
      *
      * @param msg  the message
      * @param name the name of the client who sent the message
      */
-    public void handle(String msg, String name) {
+    private void handle(String msg, String name) {
 
-        // private messages in form "/msg name message"
+        // private messages in form "/pm name message"
         if (msg.startsWith("msg ")) { // user sent text
             if (msg.substring(4).startsWith("/pm ")) {
                 msg = msg.substring(4);
                 String[] words = msg.split(" ");
+                // receiver of private message
                 String receiver = words[1];
                 boolean sent = false;
                 for (int i = 0; i < clients.size(); i++) {
@@ -104,13 +107,20 @@ public class ChatServer {
             }
         } else if (msg.startsWith("client ")) { // list of online clients
             for (ConnectionHandler i : clients) {
-                System.out.println("msg");
+                if (msg.charAt(7) == 'r') {
+                    System.out.println("Client disconnected");
+                }
                 i.sendClient(msg);
             }
         }
     }
 
-    public boolean usableName(String name) {
+    /*
+     * Determines whether a username has been used already or not
+     * @param name the name
+     * @return true, if the name has not been taken or false if it has
+     */
+    private boolean usableName(String name) {
         for (int i = 0; i < clients.size(); i++) {
             if (clients.get(i).getName() != null) {
                 if (clients.get(i).getName().equals(name)) {
@@ -147,11 +157,16 @@ public class ChatServer {
             running = true;
         } //end of constructor
 
-        public String getName() {
+        /*
+         * Gets the name of the client
+         * @return the name of the client
+         */
+        private String getName() {
             return name;
         }
 
-        /* run
+        /**
+         * run
          * executed on start of thread
          */
         public void run() {
@@ -210,7 +225,12 @@ public class ChatServer {
             }
         } // end of run()
 
-        public void send(String name, String msg) {
+        /*
+         * Sends a message back to the client
+         * @param name the name of the sender
+         * @param msg the message sent
+         */
+        private void send(String name, String msg) {
             // other people sent the message
             output.println(name + ": " + msg);
 //            output.println(name);
@@ -218,17 +238,30 @@ public class ChatServer {
             output.flush();
         }
 
-        public void sendError(String error) {
+        /*
+         * Sends an error to the client
+         * @param error the error
+         */
+        private void sendError(String error) {
             output.println("error " + error);
             output.flush();
         }
 
-        public void sentPM(String receiver, String msg) {
+        /*
+         * Sends a private message to the client
+         * @param receiver the receiver of the message
+         * @param msg the message sent
+         */
+        private void sentPM(String receiver, String msg) {
             output.println(getName() + " to " + receiver + " (private) : " + msg);
             output.flush();
         }
 
-        public void sendClient(String msg) {
+        /*
+         * Sends the client a client add or client remove
+         * @param msg the message
+         */
+        private void sendClient(String msg) {
             output.println(msg);
             output.flush();
         }
