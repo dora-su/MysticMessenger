@@ -1,3 +1,11 @@
+/**
+ * [Sound.java]
+ * @author Dora Su
+ * Version: 2.0
+ * Date: December 14, 2018
+ * Makes playing sounds easier and less blocky, takes care of audiostreaminput, exceptions
+ */
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -8,7 +16,7 @@ import java.io.IOException;
 
 public class Sound {
 
-   private Clip clip;
+    private Clip clip;
 
     public Sound(String filename){
         try {

@@ -1,6 +1,5 @@
 /**
  * [ChatClient.java]
- *
  * @author Chris Xie & Dora Su
  * Version: 2.0
  * Date: December 14, 2018
@@ -33,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
