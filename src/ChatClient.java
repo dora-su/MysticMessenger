@@ -26,7 +26,8 @@ public class ChatClient {
     private Socket mySocket; //socket for connection
     private BufferedReader input; //reader for network stream
     private PrintWriter output;  //printwriter for network output
-    private boolean running=true; //thread status via boolean
+    private boolean running = true; //thread status via boolean
+    private boolean loggedIn = false;
 
     private String name = ""; //username
 
@@ -46,10 +47,8 @@ public class ChatClient {
     //JFrames
     private JFrame window; //frame for displaying everything
 
-    //logon window components
-    private JDialog logon; //to display everything
-    //JButtons
-    private JButton login;
+    //logon option pane
+    int option;
     //JLabels
     private JLabel welcome;
     private JLabel username;
@@ -163,79 +162,77 @@ public class ChatClient {
         c.gridheight = 4;
         panel.add(online, c); //add to main panel
 
-        //Logon Window
-        logon = new JDialog(window, "Mystic Messenger");
-        logon.setResizable(false);
-        logon.setSize(400, 380);
-        logon.setLayout(null); //no layout
-        logon.addWindowListener(new WindowAdapter() { //closes program upon closing dialog box
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        //centers the logon window relative to the main chat window
-        logon.setLocation(window.getX() + (window.getWidth() - logon.getWidth()) / 2, window.getY() + (window.getHeight() - logon.getHeight()) / 2);
-
-        //set IconImage
-        logon.setIconImage(icon.getImage());
-
         //Welcome JLabel
         welcome = new JLabel("Welcome!");
         welcome.setHorizontalAlignment(SwingConstants.CENTER);
         welcome.setBounds(30, 20, 330, 60);
-        logon.add(welcome);
 
         //Username JLabel
         username = new JLabel("Username: ");
         username.setBorder(null);
         username.setBounds(30, 90, (int) username.getPreferredSize().getWidth(), 30);
-        logon.add(username);
 
         //Username JTextField
         usernameT = new JTextField();
         usernameT.setBounds(110, 90, 260, 30);
-        logon.add(usernameT);
 
         //IP Address JLabel
         ip = new JLabel("IP Address: ");
         ip.setBorder(null);
         ip.setBounds(30, 130, (int) ip.getPreferredSize().getWidth(), 30);
-        logon.add(ip);
 
         //IP Address JTextField
         ipT = new JTextField();
         ipT.setBounds(110, 130, 260, 30);
-        logon.add(ipT);
 
         //Port JLabel
         port = new JLabel("Port: ");
         port.setBorder(null);
         port.setBounds(30, 170, (int) ip.getPreferredSize().getWidth(), 30);
-        logon.add(port);
 
         //Port JTextField
         portT = new JTextField();
         portT.setBounds(110, 170, 260, 30);
-        logon.add(portT);
 
         //Error Message JLabel
         errorMessage = new JLabel(""); //initially set to no text since there is no error yet
         errorMessage.setBounds(30, 260, 340, 40);
         errorMessage.setForeground(Color.red);
-        logon.add(errorMessage);
 
-        //Login Button
-        login = new JButton("Let's Go!");
-        login.setBounds(30, 220, 340, 40); //Set to align with previous rows
-        login.addActionListener(new LoginListener());
-        logon.add(login);
+        UIManager.put("OptionPane.minimumSize", new Dimension(300, 250));
 
-        //Make sure the logon dialog window is visible
-        logon.setVisible(true);
+        Object[] fields = {
+                welcome,
+                username, usernameT,
+                ip, ipT,
+                port, portT,
+                errorMessage
+        };
+        Object[] buttons = {"Quit", "Let's Go"};
 
-        //Add the main chat window panel to the frame
-        window.add(panel);
+        while (!loggedIn) { //as long as they have not logged in yet, keep creating the option pane
+            option = JOptionPane.showOptionDialog(window, fields, "Mystic Messenger", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, buttons, null);
+            if (option == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            } else {
+                if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
+                    errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
+                }
+
+                //Other possible error is that the username has been already taken
+                else if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
+                    errorMessage.setText("Username is already taken. Please enter a new username.");
+                    usernameT.setText("");
+                } else {
+                    //No Error:
+                    //Add the main chat window panel to the frame
+                    window.add(panel);
+                    window.setVisible(true); //makes main window visible
+                    readMessagesFromServer(); //Starts to wait for messsages from the server
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -349,28 +346,4 @@ public class ChatClient {
             typeField.setText("");
         }
     }
-
-    class LoginListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            //Check for Errors
-            //If fields are left blank
-            if ((usernameT.getText().length() == 0) || (ipT.getText().length() == 0) || (portT.getText().length() == 0)) {
-                errorMessage.setText("Fields cannot be blank. Please fill in the missing fields.");
-            }
-
-            //Other possible error is that the username has been already taken
-            if (!connect(usernameT.getText(), ipT.getText(), Integer.parseInt(portT.getText()))) {
-                errorMessage.setText("Username is already taken. Please enter a new username.");
-                usernameT.setText("");
-            } else {
-                //No Error:
-                window.add(panel);
-                window.setVisible(true); //makes main window visible
-                readMessagesFromServer(); //Starts to wait for messsages from the server
-
-            }
-        }
-    }
-
 }
