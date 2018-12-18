@@ -1,5 +1,6 @@
 /**
  * [ChatClient.java]
+ *
  * @author Chris Xie & Dora Su
  * Version: 2.0
  * Date: December 14, 2018
@@ -88,6 +89,7 @@ public class ChatClient {
 
     /**
      * main method to start and create the client
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -343,13 +345,20 @@ public class ChatClient {
 
                     if (msg.startsWith("client ")) {
                         System.out.println(msg);
-                        if (msg.substring(7).startsWith("add ")) { //new person online, add to onlineList
-                            String name = msg.substring(11); // name of client
-                            onlineList.addElement(name); //add to list
-                        } else { //someone left the chat, remove from onlineList
-                            String name = msg.substring(14); // name of client that left
-                            onlineList.removeElement(name); //remove from list
+
+                        msg = msg.substring(7);
+                        String[] names = msg.split(" ");
+                        onlineList.clear();
+                        for (int i = 0; i < names.length; i++) {
+                            onlineList.addElement(names[i]);
                         }
+//                        if (msg.substring(7).startsWith("add ")) { //new person online, add to onlineList
+//                            String name = msg.substring(11); // name of client
+//                            onlineList.addElement(name); //add to list
+//                        } else { //someone left the chat, remove from onlineList
+//                            String name = msg.substring(14); // name of client that left
+//                            onlineList.removeElement(name); //remove from list
+//                        }
                     } else if (msg.startsWith("error ")) { //error messages
                         msgArea.add(new Message(msg.substring(6))); //special message constructor for error messages
                     } else {
@@ -361,7 +370,7 @@ public class ChatClient {
                         //Add message to message area
                         //boolean determines whether the specific client sent it, differentiates colours depending on who sent it
                         msgArea.add(new Message(msgName, message, msgName.equals(this.name)));
-                        if(!msgName.equals(this.name)){ //if this client was not the sender of the message, play the incoming sound notification
+                        if (!msgName.equals(this.name)) { //if this client was not the sender of the message, play the incoming sound notification
                             incoming.play(); //play the incoming message sound
                         }
                     }
@@ -404,10 +413,12 @@ public class ChatClient {
         public void keyPressed(KeyEvent event) {
             if (event.getKeyCode() == KeyEvent.VK_ENTER) {
                 //Send a message to the client
-                send.play(); //play the send message sound
-                output.println("msg " + typeField.getText());
-                output.flush();
-                typeField.setText("");
+                if (typeField.getText().length() > 0) {
+                    send.play(); //play the send message sound
+                    output.println("msg " + typeField.getText());
+                    output.flush();
+                    typeField.setText("");
+                }
             }
         }
     }

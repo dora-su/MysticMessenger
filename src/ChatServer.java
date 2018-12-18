@@ -106,12 +106,26 @@ public class ChatServer {
                 }
             }
         } else if (msg.startsWith("client ")) { // list of online clients
-            for (ConnectionHandler i : clients) {
-                if (msg.charAt(7) == 'r') {
-                    System.out.println("Client disconnected");
+            System.out.println(msg);
+            if (msg.charAt(7) == 'r') {
+                String removeName = msg.substring(14);
+                for (ConnectionHandler i : clients) {
+                    if (i.getName().equals(removeName)) {
+                        clients.remove(i);
+                    }
                 }
-                i.sendClient(msg);
             }
+            clientList();
+        }
+    }
+
+    private void clientList() {
+        String[] names = new String[clients.size()];
+        for (int i = 0; i < clients.size(); i++) {
+            names[i] = clients.get(i).getName();
+        }
+        for (ConnectionHandler i : clients) {
+            i.sendClient(names);
         }
     }
 
@@ -261,7 +275,11 @@ public class ChatServer {
          * Sends the client a client add or client remove
          * @param msg the message
          */
-        private void sendClient(String msg) {
+        private void sendClient(String[] names) {
+            String msg = "client ";
+            for (int i = 0; i < names.length; i++) {
+                msg += names[i] + " ";
+            }
             output.println(msg);
             output.flush();
         }
