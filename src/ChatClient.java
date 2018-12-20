@@ -397,11 +397,12 @@ public class ChatClient {
      */
     class SendButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
-            //Send a message to the client
-            send.play(); //play the send message sound
-            output.println("msg " + typeField.getText());
-            output.flush();
-            typeField.setText(""); //reset text field
+            if (typeField.getText().length() > 0) {
+                send.play(); //play the send message sound
+                output.println("msg " + typeField.getText());
+                output.flush();
+                typeField.setText("");
+            }
         }
     }
 
@@ -414,7 +415,7 @@ public class ChatClient {
             if (event.getKeyCode() == KeyEvent.VK_ENTER) {
                 //Send a message to the client
                 if (typeField.getText().length() > 0) {
-                    send.play(); //play the send message sound
+                    send.play(); //play the message sound
                     output.println("msg " + typeField.getText());
                     output.flush();
                     typeField.setText("");

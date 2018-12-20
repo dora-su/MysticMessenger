@@ -1,9 +1,10 @@
-/*
-    ChatServer.java
-    Version: 2.0
-    Author: Chris Xie
-    Date: December 14, 2018
-    Runs a server that clients can connect to
+/**
+ * [ChatServer.java]
+ *
+ * @author Chris Xie & Dora Su
+ * Version: 2.0
+ * Date: December 14, 2018
+ * Simple chat server that clients connect to, send/receive messages back to clients
  */
 
 //imports for network communication
@@ -109,9 +110,11 @@ public class ChatServer {
             System.out.println(msg);
             if (msg.charAt(7) == 'r') {
                 String removeName = msg.substring(14);
+                System.out.println(removeName);
                 for (ConnectionHandler i : clients) {
                     if (i.getName().equals(removeName)) {
                         clients.remove(i);
+                        break;
                     }
                 }
             }
@@ -230,12 +233,13 @@ public class ChatServer {
 
             //close the socket
             try {
+                server.handle("client remove " + name, name);
                 input.close();
                 output.close();
                 client.close();
-                server.handle("client remove " + name, name);
             } catch (Exception e) {
                 System.out.println("Failed to close socket");
+                e.printStackTrace();
             }
         } // end of run()
 
